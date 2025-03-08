@@ -1,10 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import LockImage from "../assets/LockImage.jpg";
+import { Link, useNavigate } from "react-router-dom";
+import eventsImage from "../assets/eventsImage.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { loginDispatchFunction } from "@/redux/slices/authSlice";
 
 const LoginPage = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { loading } = useSelector((state) => state.auth);
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -19,11 +26,15 @@ const LoginPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        const { email, password } = formData;
+
         if (!email || !password) {
             alert(`All fields are required!`);
         }
 
         console.log("formData", formData);
+
+        dispatch(loginDispatchFunction(formData));
     };
 
     return (
@@ -31,7 +42,7 @@ const LoginPage = () => {
             <div className="flex flex-col-2 w-full h-screen">
                 <div
                     className="w-full bg-cover bg-center hidden md:block"
-                    style={{ backgroundImage: `url(${LockImage})` }}
+                    style={{ backgroundImage: `url(${eventsImage})` }}
                 ></div>
 
                 <div className="w-full flex flex-col justify-center p-8 gap-y-4">
@@ -58,7 +69,7 @@ const LoginPage = () => {
                         className="cursor-pointer bg-gray-800"
                         onClick={handleSubmit}
                     >
-                        Login
+                        {loading ? "Loading..." : "Login"}
                     </Button>
 
                     <p>

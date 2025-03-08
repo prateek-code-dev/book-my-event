@@ -1,0 +1,72 @@
+import { loginApiRequest, registerApiRequest } from "@/assets/services/authApi";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+// Login Slice
+export const loginDispatchFunction = createAsyncThunk(
+    "authLogin",
+    async (postData) => {
+        try {
+            const response = await loginApiRequest(postData);
+
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+);
+
+export const registerDispatchFunction = createAsyncThunk(
+    "authRegister",
+    async (postData) => {
+        try {
+            const response = await registerApiRequest(postData);
+
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+);
+
+// Reducer and action
+
+export const authSlice = createSlice({
+    name: "authSlice",
+    initialState: {
+        loading: false,
+        error: null,
+        data: [],
+    },
+
+    extraReducers: (builder) => {
+        builder
+            // Login
+            .addCase(loginDispatchFunction.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(loginDispatchFunction.fulfilled, (state, action) => {
+                (state.loading = false),
+                    (state.data = action.payload),
+                    (state.error = null);
+            })
+            .addCase(loginDispatchFunction.rejected, (state, action) => {
+                (state.loading = false), (state.error = action.payload);
+            })
+
+            //Register
+            .addCase(registerDispatchFunction.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(registerDispatchFunction.fulfilled, (state, action) => {
+                (state.loading = false),
+                    (state.data = action.payload),
+                    (state.error = null);
+            })
+            .addCase(registerDispatchFunction.rejected, (state, action) => {
+                (state.loading = false), (state.error = action.payload);
+            });
+    },
+});
+
+export default authSlice.reducer;

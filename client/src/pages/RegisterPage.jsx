@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LockImage from "../assets/LockImage.jpg";
+import eventsImage from "../assets/eventsImage.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { registerDispatchFunction } from "@/redux/slices/authSlice";
 
 const RegisterPage = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { loading } = useSelector((state) => state.auth);
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -20,11 +28,15 @@ const RegisterPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!email || !password) {
-            alert(`All fields are required!`);
+        const { name, email, password } = formData;
+
+        if (!name || !email || !password) {
+            return alert(`All fields are required!`);
         }
 
-        console.log("formData", formData);
+        // console.log("formData", formData);
+
+        dispatch(registerDispatchFunction(formData));
     };
 
     return (
@@ -32,7 +44,7 @@ const RegisterPage = () => {
             <div className="flex flex-col-2 w-full h-screen">
                 <div
                     className="w-full bg-cover bg-center hidden md:block"
-                    style={{ backgroundImage: `url(${LockImage})` }}
+                    style={{ backgroundImage: `url(${eventsImage})` }}
                 ></div>
 
                 <div className="w-full flex flex-col justify-center p-8 gap-y-4">
@@ -43,7 +55,7 @@ const RegisterPage = () => {
                     <Input
                         placeholder="Enter your Name"
                         name="name"
-                        type="name"
+                        type="text"
                         onChange={handleChange}
                     />
 
@@ -67,7 +79,7 @@ const RegisterPage = () => {
                         className="cursor-pointer bg-gray-800"
                         onClick={handleSubmit}
                     >
-                        Register
+                        {loading ? "Loading..." : "Register"}
                     </Button>
 
                     <p>

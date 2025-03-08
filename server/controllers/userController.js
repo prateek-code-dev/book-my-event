@@ -28,9 +28,12 @@ export const loginController = async (req, res, next) => {
             return next(handleError(400, `Invalid email or password!`));
         }
 
-        const token = await jwt.sign({ email }, process.env.TOKEN_SECRET_KEY);
+        const tokenValue = await jwt.sign(
+            { email },
+            process.env.TOKEN_SECRET_KEY
+        );
 
-        if (!token) {
+        if (!tokenValue) {
             return next(handleError(400, `Try again later!`));
         }
 
@@ -38,7 +41,7 @@ export const loginController = async (req, res, next) => {
 
         return res
             .status(200)
-            .cookie("token", token)
+            .cookie("token", tokenValue, { httpOnly: true })
             .json({
                 success: true,
                 message: `${response.email} logged in successfully!`,
@@ -52,9 +55,9 @@ export const loginController = async (req, res, next) => {
 
 export const registerController = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
+        const { name, email, password } = req.body;
 
-        if (!email || !password) {
+        if (!name || !email || !password) {
             return next(handleError(400, `All fields are required!`));
         }
 
@@ -73,6 +76,7 @@ export const registerController = async (req, res, next) => {
         // console.log(`hashedPassword`, hashedPassword);
 
         const response = await UserModel.create({
+            name,
             email,
             password: hashedPassword,
         });
