@@ -22,7 +22,7 @@ export const loginController = async (req, res, next) => {
             response.password
         );
 
-        console.log(`decoded password`, decodedPassword);
+        // console.log(`decoded password`, decodedPassword);
 
         if (!decodedPassword) {
             return next(handleError(400, `Invalid email or password!`));
@@ -103,6 +103,18 @@ export const logoutController = async (req, res, next) => {
     } catch (error) {
         return next(
             handleError(500, `Internal server error in logout controller!`)
+        );
+    }
+};
+
+export const userDetailsController = async (req, res, next) => {
+    try {
+    } catch (error) {
+        return next(
+            handleError(
+                500,
+                `Internal server error in user details controller!`
+            )
         );
     }
 };

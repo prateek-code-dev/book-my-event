@@ -40,9 +40,11 @@ export const commonApiRequest = async (
 
         // console.log("response:", response);
 
-        return response;
+        return response.data;
     } catch (error) {
-        console.error("Error in commonApiRequest:", error);
-        throw error;
+        // console.error("Error in commonApiRequest:", error);
+        const errorMessage = error?.response?.data?.message;
+        console.error("errorMessage", errorMessage);
+        throw new Error(errorMessage || "Error");
     }
 };

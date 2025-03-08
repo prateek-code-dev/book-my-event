@@ -6,6 +6,7 @@ import LockImage from "../assets/LockImage.jpg";
 import eventsImage from "../assets/eventsImage.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { registerDispatchFunction } from "@/redux/slices/authSlice";
+import { showToast } from "@/helper/showToast";
 
 const RegisterPage = () => {
     const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const RegisterPage = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const { name, email, password } = formData;
@@ -36,7 +37,19 @@ const RegisterPage = () => {
 
         // console.log("formData", formData);
 
-        dispatch(registerDispatchFunction(formData));
+        try {
+            const result = await dispatch(
+                registerDispatchFunction(formData)
+            ).unwrap();
+
+            if (result.success) {
+                navigate("/login");
+
+                showToast("success", `Registration done! Kindly Login!`);
+            }
+        } catch (error) {
+            showToast("error", `Error ${error}`);
+        }
     };
 
     return (
@@ -84,7 +97,7 @@ const RegisterPage = () => {
 
                     <p>
                         <Link to={"/login"}>
-                            Already have an account? Register
+                            Already have an account? Login
                         </Link>
                     </p>
                 </div>

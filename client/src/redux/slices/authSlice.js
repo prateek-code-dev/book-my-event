@@ -5,26 +5,30 @@ import axios from "axios";
 // Login Slice
 export const loginDispatchFunction = createAsyncThunk(
     "authLogin",
-    async (postData) => {
+    async (postData, thunkAPI) => {
         try {
             const response = await loginApiRequest(postData);
 
-            return response.data;
+            return response;
         } catch (error) {
-            throw error;
+            console.log("error", error);
+            const errorMessage = error || "Login failed. Please try again.";
+            return thunkAPI.rejectWithValue(errorMessage);
         }
     }
 );
 
 export const registerDispatchFunction = createAsyncThunk(
     "authRegister",
-    async (postData) => {
+    async (postData, thunkAPI) => {
         try {
             const response = await registerApiRequest(postData);
 
             return response.data;
         } catch (error) {
-            throw error;
+            console.log("error", error);
+            const errorMessage = error || "Register failed. Please try again.";
+            return thunkAPI.rejectWithValue(errorMessage);
         }
     }
 );

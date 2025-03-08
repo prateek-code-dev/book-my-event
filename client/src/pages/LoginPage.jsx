@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import eventsImage from "../assets/eventsImage.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { loginDispatchFunction } from "@/redux/slices/authSlice";
+import { showToast } from "@/helper/showToast";
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const LoginPage = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const { email, password } = formData;
@@ -32,9 +33,20 @@ const LoginPage = () => {
             alert(`All fields are required!`);
         }
 
-        console.log("formData", formData);
+        // console.log("formData", formData);
 
-        dispatch(loginDispatchFunction(formData));
+        try {
+            const response = await dispatch(
+                loginDispatchFunction(formData)
+            ).unwrap();
+
+            if (response.success) {
+                navigate("/login");
+            }
+            showToast("success", `Welcome`);
+        } catch (error) {
+            showToast("error", `Error ${error}`);
+        }
     };
 
     return (
