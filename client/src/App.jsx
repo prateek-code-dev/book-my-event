@@ -1,13 +1,20 @@
 import React from "react";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import RegisterPage from "./pages/RegisterPage";
 
 const App = () => {
     return (
-        <div className="">
-            <Button className="bg-red-900 text-xl px-8 py-6">App</Button>
-            <Input />
-        </div>
+        <>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                </Routes>
+            </BrowserRouter>
+        </>
     );
 };
 
