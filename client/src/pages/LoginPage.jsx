@@ -41,7 +41,7 @@ const LoginPage = () => {
             ).unwrap();
 
             if (response.success) {
-                navigate("/login");
+                navigate("/home");
             }
             showToast("success", `Welcome`);
         } catch (error) {
