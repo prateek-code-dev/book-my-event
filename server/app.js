@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { dbConnect } from "./config/db.js";
 import { userRouter } from "./routes/userRoute.js";
+import { eventRouter } from "./routes/eventRoute.js";
 
 dotenv.config();
 
@@ -18,7 +19,8 @@ app.use(
     })
 );
 
-app.use("/v1/", userRouter);
+app.use("/v1/user/", userRouter);
+app.use("/v1/event/", eventRouter);
 
 dbConnect();
 

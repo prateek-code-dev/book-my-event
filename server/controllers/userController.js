@@ -48,7 +48,10 @@ export const loginController = async (req, res, next) => {
             });
     } catch (error) {
         return next(
-            handleError(500, `Internal server error in login controller!`)
+            handleError(
+                500,
+                `Internal server error in login controller! ${error.message}`
+            )
         );
     }
 };
@@ -102,7 +105,10 @@ export const logoutController = async (req, res, next) => {
             .json({ success: true, message: `Logout successful!` });
     } catch (error) {
         return next(
-            handleError(500, `Internal server error in logout controller!`)
+            handleError(
+                500,
+                `Internal server error in logout controller! ${error.message}`
+            )
         );
     }
 };
@@ -113,7 +119,7 @@ export const userDetailsController = async (req, res, next) => {
         return next(
             handleError(
                 500,
-                `Internal server error in user details controller!`
+                `Internal server error in user details controller! ${error.message}`
             )
         );
     }

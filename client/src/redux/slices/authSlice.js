@@ -1,4 +1,4 @@
-import { loginApiRequest, registerApiRequest } from "@/assets/services/authApi";
+import { loginApiRequest, registerApiRequest } from "@/services/authApi";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 

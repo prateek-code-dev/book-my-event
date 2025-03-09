@@ -6,13 +6,13 @@ export const validateToken = async (req, res, next) => {
         const { token } = req.cookies;
 
         if (!token) {
-            return next(handleError(400, `Invalid Credentials!`));
+            return next(handleError(400, `Unauthorized! Invalid Credentials!`));
         }
 
         const result = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
 
         if (!result) {
-            return next(handleError(400, `Invalid Credentials!`));
+            return next(handleError(400, `Unauthorized! Invalid Credentials!`));
         }
 
         req.user = result;
