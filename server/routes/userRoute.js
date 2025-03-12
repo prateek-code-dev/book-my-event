@@ -3,6 +3,7 @@ import {
     loginController,
     logoutController,
     registerController,
+    userDetailsController,
 } from "../controllers/userController.js";
 import { validateToken } from "../middleware/validateToken.js";
 
@@ -14,4 +15,4 @@ userRouter.post("/login", loginController);
 
 userRouter.get("/logout", validateToken, logoutController);
 
-userRouter.get("/user-profile");
+userRouter.get("/user-details/:id", validateToken, userDetailsController);

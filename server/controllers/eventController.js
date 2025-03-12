@@ -9,7 +9,7 @@ export const getAllEventsController = async (req, res) => {
             return next(handleError(400, `Try again later`));
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: `All events list`,
             data: result,
@@ -57,7 +57,7 @@ export const createEventController = async (req, res, next) => {
             return next(handleError(400, `Please try later!`));
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: `${result.eventName} Event created successfully!`,
             data: result,
@@ -79,7 +79,7 @@ export const getEventDetailsController = async (req, res) => {
             return next(handleError(400, `Try again later!`));
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: `${result.eventName} event details`,
             data: result,
@@ -123,7 +123,7 @@ export const updateEventController = async (req, res) => {
             new: true,
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: `Event updated successfully!`,
             data: result,

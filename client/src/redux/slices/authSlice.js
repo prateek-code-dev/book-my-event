@@ -24,7 +24,7 @@ export const registerDispatchFunction = createAsyncThunk(
         try {
             const response = await registerApiRequest(postData);
 
-            return response.data;
+            return response;
         } catch (error) {
             console.log("error", error);
             const errorMessage = error || "Register failed. Please try again.";

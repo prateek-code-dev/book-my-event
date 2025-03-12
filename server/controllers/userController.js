@@ -11,16 +11,13 @@ export const loginController = async (req, res, next) => {
             return next(handleError(400, `All fields are required!`));
         }
 
-        const response = await UserModel.findOne({ email });
+        const result = await UserModel.findOne({ email });
 
-        if (!response) {
+        if (!result) {
             return next(handleError(400, `Email not found, please register!`));
         }
 
-        const decodedPassword = await bcrypt.compare(
-            password,
-            response.password
-        );
+        const decodedPassword = await bcrypt.compare(password, result.password);
 
         // console.log(`decoded password`, decodedPassword);
 
@@ -44,7 +41,8 @@ export const loginController = async (req, res, next) => {
             .cookie("token", tokenValue, { httpOnly: true })
             .json({
                 success: true,
-                message: `${response.email} logged in successfully!`,
+                message: `${result.email} logged in successfully!`,
+                data: result,
             });
     } catch (error) {
         return next(
@@ -78,7 +76,7 @@ export const registerController = async (req, res, next) => {
 
         // console.log(`hashedPassword`, hashedPassword);
 
-        const response = await UserModel.create({
+        const result = await UserModel.create({
             name,
             email,
             password: hashedPassword,
@@ -88,7 +86,8 @@ export const registerController = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            message: `${response.email} user created successfully`,
+            message: `${result.email} user created successfully`,
+            data: result,
         });
     } catch (error) {
         return next(
@@ -115,6 +114,23 @@ export const logoutController = async (req, res, next) => {
 
 export const userDetailsController = async (req, res, next) => {
     try {
+        const { id } = req.params;
+
+        if (!id) {
+            return next(handleError(400, `Unauthorized Invalid credentials!`));
+        }
+
+        const result = await UserModel.findById(id);
+
+        if (!result) {
+            return next(handleError(400, `Unauthorized Invalid credentials!`));
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `${result.name} Welcome!`,
+            data: result,
+        });
     } catch (error) {
         return next(
             handleError(
