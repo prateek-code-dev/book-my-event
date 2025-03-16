@@ -26,7 +26,7 @@ export const loginController = async (req, res, next) => {
         }
 
         const tokenValue = await jwt.sign(
-            { email },
+            { id: result._id, email: result.email, isAdmin: result.isAdmin },
             process.env.TOKEN_SECRET_KEY
         );
 

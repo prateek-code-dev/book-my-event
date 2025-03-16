@@ -3,132 +3,116 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { IoIosCloseCircle } from "react-icons/io";
+import { updateEventRequest } from "@/services/eventsApi";
 import { showToast } from "@/helper/showToast";
-import { createEventFunction } from "@/redux/slices/eventSlice";
-import moment from "moment";
-import React, { useState } from "react";
-import { IoIosClose } from "react-icons/io";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { updateEventFunction } from "@/redux/slices/eventSlice";
 
-const CreateEventsPage = () => {
+const EditEventsPage = () => {
+    const params = useParams();
+    // console.log("params", params);
+
     const dispatch = useDispatch();
-
     const navigate = useNavigate();
 
-    const [guestName, setGuestName] = useState("");
-    const [guestList, setGuestList] = useState([]);
+    const { allEventsData } = useSelector((state) => state.event) || {};
+    // console.log("allEventsData", allEventsData.data);
 
-    const [singleTicket, setSingleTicket] = useState({
-        name: "",
-        price: "",
-        limit: "",
-    });
+    const [editEventData, setEditEventData] = useState(null);
+    // console.log("editEventData", editEventData);
 
-    const [ticketList, setTicketList] = useState([]);
+    const [addSingleGuest, setAddSingleGuest] = useState(null);
 
-    const [formData, setFormData] = useState({
-        eventName: "",
-        eventDescription: "",
-        eventOrganizer: "",
-        eventGuests: [],
-        eventAddress: "",
-        eventCity: "",
-        eventPinCode: "",
-        eventDate: "",
-        eventTime: "",
-        eventMedia: [],
-        eventTickets: [
-            {
-                name: "",
-                price: 0,
-                limit: 0,
-            },
-        ],
-    });
+    useEffect(() => {
+        const getEditEventData = async () => {
+            try {
+                const singleEditEventData = allEventsData?.data?.filter(
+                    (e) => e._id === params.id
+                );
+
+                // console.log("singleEditEventData", singleEditEventData);
+                setEditEventData(singleEditEventData[0]);
+
+                setTicketType(editEventData?.eventTickets);
+            } catch (error) {}
+        };
+
+        if (allEventsData) {
+            getEditEventData();
+        }
+
+        // getEditEventData();
+    }, [params, allEventsData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        setFormData({ ...formData, [name]: value });
-
-        // console.log("Form Data", formData);
+        setEditEventData({ ...editEventData, [name]: value });
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-
         try {
-            const response = await dispatch(
-                createEventFunction(formData)
-            ).unwrap();
+            console.log("editEventData", editEventData);
 
-            if (response.success) {
-                showToast("success", `Success ${response.message}`);
-                setFormData({});
-                navigate("/admin/all-event");
-            } else {
-                showToast("error", `Error ${response.message}!`);
+            const response = await dispatch(
+                updateEventFunction({
+                    postData: editEventData,
+                    id: editEventData._id,
+                })
+            ).unwrap();
+            console.log("response", response);
+            if (!response.success) {
+                return showToast("error", `Error! ${response.message}`);
             }
+
+            showToast("success", `Success ${response.message}`);
+            navigate("/admin/all-event");
         } catch (error) {
-            console.log("error", error);
-            showToast("error", `Error ${error.message}`);
+            return showToast("error", `Error! ${error}`);
         }
     };
 
-    const addGuestHandle = (e) => {
-        const updatedGuestList = [...guestList, guestName];
+    const handleGuestRemove = (item, index) => {
+        // console.log("item guest", item);
+        // console.log("index guest", index);
 
-        setGuestList(updatedGuestList);
-
-        setFormData({ ...formData, eventGuests: updatedGuestList });
-
-        setGuestName("");
-    };
-
-    const removeGuestNameFromListHandle = (indexToRemove) => {
-        const updatedGuestList = guestList.filter(
-            (e, i) => i !== indexToRemove
+        const updatedGuests = editEventData?.eventGuests?.filter(
+            (e) => e !== item
         );
-
-        setGuestList(updatedGuestList);
-
-        setFormData({ ...formData, eventGuests: updatedGuestList });
+        setEditEventData({ ...editEventData, eventGuests: updatedGuests });
     };
 
-    const ticketListHandle = (e) => {
-        const updatedTicketList = [...ticketList, singleTicket];
-
-        // console.log("updatedTicketList", updatedTicketList);
-
-        setTicketList(updatedTicketList);
-
-        setFormData({ ...formData, eventTickets: ticketList });
-
-        setSingleTicket({ name: "", price: 0, limit: 0 });
-    };
-
-    const ticketsRemoveHandle = (index) => {
+    const handleRemoveTicketType = (item, index) => {
+        // console.log("item", item);
         // console.log("index", index);
 
-        const updatedTicketList = ticketList.filter((e, id) => id !== index);
+        const updatedTicketType = editEventData?.eventTickets?.filter(
+            (e) => e.name !== item.name
+        );
+        // console.log("updatedTicketType", updatedTicketType);
 
-        setTicketList(updatedTicketList);
+        setEditEventData({ ...editEventData, eventTickets: updatedTicketType });
     };
 
-    const handleDateChange = (date) => {
-        // console.log("handleDateChange", date);
+    const handleAddGuest = () => {
+        const updatedGuestList = [
+            ...[editEventData.eventGuests],
+            addSingleGuest,
+        ];
+        setEditEventData({
+            ...editEventData,
+            eventGuests: updatedGuestList,
+        });
 
-        const isoDate = moment(date).toISOString();
-
-        setFormData({ ...formData, eventDate: isoDate });
+        console.log("updatedGuestList", updatedGuestList);
     };
 
     return (
         <>
-            <h1 className="text-3xl font-bold text-gray-800 p-2">
-                Create New Event
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-800 p-2">Edit Event</h1>
             <div className="flex flex-col gap-4 p-2 w-full">
                 <div className="flex items-center gap-4">
                     <Label className="text-xl font-bold text-gray-800 w-full">
@@ -139,6 +123,7 @@ const CreateEventsPage = () => {
                         className="border-2 w-full cursor-pointer hover:bg-gray-100 text-xl"
                         placeholder="Enter Event Name"
                         name="eventName"
+                        value={editEventData?.eventName || ""}
                         type="text"
                         onChange={handleChange}
                     />
@@ -151,6 +136,7 @@ const CreateEventsPage = () => {
                         required
                         className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
                         placeholder="Enter Event Description"
+                        value={editEventData?.eventDescription || ""}
                         name="eventDescription"
                         type="text"
                         onChange={handleChange}
@@ -165,6 +151,7 @@ const CreateEventsPage = () => {
                         className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
                         placeholder="Enter Event Organizer"
                         name="eventOrganizer"
+                        value={editEventData?.eventOrganizer}
                         type="text"
                         onChange={handleChange}
                     />
@@ -176,28 +163,30 @@ const CreateEventsPage = () => {
                     <div className="flex w-full gap-2">
                         <Input
                             className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                            placeholder="Enter Event Guests"
-                            value={guestName}
+                            placeholder="Add New Guests"
                             type="text"
-                            onChange={(e) => setGuestName(e.target.value)}
+                            name="eventGuests"
+                            onChange={(e) => setAddSingleGuest(e.target.value)}
                         />
-                        <Button onClick={addGuestHandle}>Add Guest</Button>
+                        <Button onClick={handleAddGuest}>Add Guest</Button>
                     </div>
                 </div>
-                <div className="flex w-full">
+                <div className="w-full flex">
                     <div className="w-full"></div>
-                    <div className="flex gap-2 w-full">
-                        {guestList &&
-                            guestList.map((e, i) => (
+                    <div className="w-full flex gap-2">
+                        {editEventData &&
+                            editEventData.eventGuests &&
+                            editEventData?.eventGuests?.length > 0 &&
+                            editEventData?.eventGuests?.map((item, index) => (
                                 <div
-                                    key={i}
-                                    className="border-2 p-2 flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                                    key={index}
+                                    className="border-2 p-2 flex items-center gap-2"
                                 >
-                                    {e}{" "}
-                                    <IoIosClose
-                                        size={24}
+                                    {item}{" "}
+                                    <IoIosCloseCircle
+                                        size="20"
                                         onClick={() =>
-                                            removeGuestNameFromListHandle(i)
+                                            handleGuestRemove(item, index)
                                         }
                                     />
                                 </div>
@@ -215,6 +204,7 @@ const CreateEventsPage = () => {
                         placeholder="Enter Event Address"
                         name="eventAddress"
                         type="text"
+                        value={editEventData?.eventAddress || ""}
                         onChange={handleChange}
                     />
                 </div>
@@ -228,6 +218,7 @@ const CreateEventsPage = () => {
                         placeholder="Enter Event City"
                         name="eventCity"
                         type="text"
+                        value={editEventData?.eventCity || ""}
                         onChange={handleChange}
                     />
                 </div>
@@ -241,6 +232,7 @@ const CreateEventsPage = () => {
                         placeholder="Enter Event Pincode"
                         name="eventPinCode"
                         type="text"
+                        value={editEventData?.eventPinCode || ""}
                         onChange={handleChange}
                     />
                 </div>
@@ -251,11 +243,13 @@ const CreateEventsPage = () => {
                     <div className="border-2 w-full bg-gray-50">
                         <DateSelector
                             required
-                            placeHolderMessage="Select Event Date"
-                            placeholder="Enter Event Date"
+                            placeHolderMessage={
+                                editEventData?.eventDate?.split("T")[0] || ""
+                            }
+                            placeholder={""}
                             name="eventDate"
                             type="date"
-                            onChange={handleDateChange}
+                            onChange={handleChange}
                         />
                     </div>
                 </div>
@@ -269,6 +263,7 @@ const CreateEventsPage = () => {
                         placeholder="Enter Event Time"
                         name="eventTime"
                         type="time"
+                        value={editEventData?.eventTime || ""}
                         onChange={handleChange}
                     />
                 </div>
@@ -292,92 +287,72 @@ const CreateEventsPage = () => {
                         <Input
                             className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
                             type="text"
-                            placeholder="Ticket Type Name"
+                            placeholder="Add New Ticket Type"
                             name="name"
-                            value={singleTicket.name}
-                            onChange={(e) =>
-                                setSingleTicket({
-                                    ...singleTicket,
-                                    [e.target.name]: e.target.value,
-                                })
-                            }
                         />
                         <Input
                             className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
                             type="text"
-                            placeholder="Ticket Type Price"
+                            placeholder="Add New Ticket Price"
                             name="price"
-                            value={singleTicket.price}
-                            onChange={(e) =>
-                                setSingleTicket({
-                                    ...singleTicket,
-                                    [e.target.name]: e.target.value,
-                                })
-                            }
                         />
                         <Input
                             className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
                             type="text"
-                            placeholder="Ticket Type Limit"
+                            placeholder="Add New Ticket Limit"
                             name="limit"
-                            value={singleTicket.limit}
-                            onChange={(e) =>
-                                setSingleTicket({
-                                    ...singleTicket,
-                                    [e.target.name]: e.target.value,
-                                })
-                            }
                         />
-                        <Button onClick={ticketListHandle}>Add Ticket</Button>
+                        <Button>Add Ticket</Button>
                     </div>
                 </div>
-                {ticketList && ticketList.length > 0 && (
-                    <div className="w-full flex">
-                        <div className="w-full text-xl font-bold text-gray-800">
-                            Ticket(s)
-                        </div>
-                        <div className="w-full items-center">
-                            {ticketList &&
-                                ticketList?.map((e, i) => (
-                                    <div key={i} className="flex gap-2 w-full">
-                                        <div className="flex w-full hover:bg-gray-100">
-                                            <Input
-                                                value={e.name}
-                                                className="w-full"
-                                                disabled
-                                            />
-                                            <Input
-                                                value={e.price}
-                                                className="w-full"
-                                                disabled
-                                            />
-                                            <Input
-                                                value={e.limit}
-                                                className="w-full"
-                                                disabled
-                                            />
-                                        </div>
+                {editEventData &&
+                    editEventData?.eventTickets &&
+                    editEventData?.eventTickets?.length > 0 && (
+                        <div className="flex w-full">
+                            <div className="w-full">1</div>
+                            <div className="w-full">
+                                {editEventData?.eventTickets?.map(
+                                    (item, index) => (
                                         <div
-                                            onClick={() =>
-                                                ticketsRemoveHandle(i)
-                                            }
+                                            key={index}
+                                            className="w-full flex gap-2 items-center"
                                         >
-                                            <IoIosClose size={42} />
+                                            <Input
+                                                value={item?.name}
+                                                disabled
+                                            />
+                                            <Input
+                                                value={`Rs. ${item?.price}`}
+                                                disabled
+                                            />
+                                            <Input
+                                                value={`${item?.limit} left`}
+                                                disabled
+                                            />
+                                            <IoIosCloseCircle
+                                                size="64"
+                                                onClick={() =>
+                                                    handleRemoveTicketType(
+                                                        item,
+                                                        index
+                                                    )
+                                                }
+                                            />
                                         </div>
-                                    </div>
-                                ))}
+                                    )
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
                 <Button
                     className="text-xl cursor-pointer"
                     onClick={handleSubmit}
                 >
-                    Create Event
+                    Edit Event
                 </Button>
             </div>
         </>
     );
 };
 
-export default CreateEventsPage;
+export default EditEventsPage;

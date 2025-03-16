@@ -7,6 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import CreateEventsPage from "./pages/admin/CreateEventsPage";
 import DisplayAllEventsPage from "./pages/admin/DisplayAllEventsPage";
+import EditEventsPage from "./pages/admin/EditEventsPage";
 
 const App = () => {
     return (
@@ -14,7 +15,7 @@ const App = () => {
             <BrowserRouter>
                 <Routes>
                     <Route
-                        path="/home"
+                        path="/"
                         element={
                             <ProtectedRoute>
                                 <HomePage />
@@ -23,11 +24,27 @@ const App = () => {
                     />
                     <Route
                         path="/admin/create-event"
-                        element={<CreateEventsPage />}
+                        element={
+                            <ProtectedRoute userType="admin">
+                                <CreateEventsPage />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route
                         path="/admin/all-event"
-                        element={<DisplayAllEventsPage />}
+                        element={
+                            <ProtectedRoute userType="admin">
+                                <DisplayAllEventsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/edit-event/:id"
+                        element={
+                            <ProtectedRoute>
+                                <EditEventsPage />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route
                         path="/login"
@@ -45,6 +62,7 @@ const App = () => {
                             </PublicRoute>
                         }
                     />
+                    <Route path="*" element={<div>404, Please login</div>} />
                 </Routes>
             </BrowserRouter>
         </>

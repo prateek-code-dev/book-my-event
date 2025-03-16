@@ -10,10 +10,10 @@ const eventSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        eventOrganizers: {
-            type: Array,
+        eventOrganizer: {
+            type: String,
             required: false,
-            default: [],
+            default: "",
         },
         eventGuests: {
             type: Array,
@@ -31,8 +31,8 @@ const eventSchema = new mongoose.Schema(
         eventPinCode: {
             type: String,
             required: true,
-            minLength: [6, "PIN code must be exactly 6 digits"],
-            maxLength: [6, "PIN code must be exactly 6 digits"],
+            minLength: [2, "PIN code must be exactly 6 digits"],
+            maxLength: [10, "PIN code must be exactly 6 digits"],
         },
         eventDate: {
             type: String,

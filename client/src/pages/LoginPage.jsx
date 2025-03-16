@@ -6,6 +6,7 @@ import eventsImage from "../assets/eventsImage.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { loginDispatchFunction } from "@/redux/slices/authSlice";
 import { showToast } from "@/helper/showToast";
+import Loading from "@/components/project-components/Loading";
 
 const LoginPage = () => {
     const dispatch = useDispatch();
@@ -41,7 +42,7 @@ const LoginPage = () => {
             ).unwrap();
 
             if (response.success) {
-                navigate("/home");
+                navigate("/");
             }
             showToast("success", `Welcome`);
         } catch (error) {
@@ -81,7 +82,7 @@ const LoginPage = () => {
                         className="cursor-pointer bg-gray-800"
                         onClick={handleSubmit}
                     >
-                        {loading ? "Loading..." : "Login"}
+                        {loading ? <Loading /> : "Login"}
                     </Button>
 
                     <p>

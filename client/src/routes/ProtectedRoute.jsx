@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, userType }) => {
     const { _id, isAdmin } =
         useSelector((state) => state.auth?.data?.data) || {};
 
@@ -20,6 +20,12 @@ const ProtectedRoute = ({ children }) => {
                 if (!_id) {
                     navigate("/login");
                     showToast("error", "Unauthorized! Please log in.");
+                    return;
+                }
+
+                if (userType === "admin" && !isAdmin) {
+                    navigate("/login");
+                    showToast("error", `Unauthorized! Admin access!`);
                     return;
                 }
 
@@ -44,7 +50,7 @@ const ProtectedRoute = ({ children }) => {
         };
 
         validateUser();
-    }, []);
+    }, [isAdmin, userType]);
 
     // Render children only if access is granted
     return <>{protectedPageAccess ? children : null}</>;

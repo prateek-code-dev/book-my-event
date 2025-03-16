@@ -1,9 +1,12 @@
 import { handleError } from "../helpers/handleError.js";
 import { eventModel } from "../models/eventModel.js";
 
-export const getAllEventsController = async (req, res) => {
+export const getAllEventsController = async (req, res, next) => {
     try {
-        const result = await eventModel.find().exec();
+        const result = await eventModel
+            .find()
+            .select("-createdAt -updatedAt -__v")
+            .exec();
 
         if (!result) {
             return next(handleError(400, `Try again later`));
@@ -29,6 +32,10 @@ export const createEventController = async (req, res, next) => {
             eventPinCode,
             eventDate,
             eventTime,
+            eventOrganizer,
+            eventGuests,
+            eventMedia,
+            eventTickets,
         } = req.body;
 
         if (
@@ -51,16 +58,27 @@ export const createEventController = async (req, res, next) => {
             eventPinCode,
             eventDate,
             eventTime,
+            eventOrganizer,
+            eventGuests,
+            eventMedia,
+            eventTickets,
         });
 
         if (!result) {
             return next(handleError(400, `Please try later!`));
         }
 
+        const filteredResult = {
+            ...result._doc,
+            createdAt: undefined,
+            updatedAt: undefined,
+            __v: undefined,
+        };
+
         return res.status(200).json({
             success: true,
             message: `${result.eventName} Event created successfully!`,
-            data: result,
+            data: filteredResult,
         });
     } catch (error) {
         return next(
@@ -69,11 +87,13 @@ export const createEventController = async (req, res, next) => {
     }
 };
 
-export const getEventDetailsController = async (req, res) => {
+export const getEventDetailsController = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        const result = await eventModel.findById(id);
+        const result = await eventModel
+            .findById(id)
+            .select("-createdAt -updatedAt -__v");
 
         if (!result) {
             return next(handleError(400, `Try again later!`));
@@ -91,7 +111,7 @@ export const getEventDetailsController = async (req, res) => {
     }
 };
 
-export const updateEventController = async (req, res) => {
+export const updateEventController = async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -119,9 +139,11 @@ export const updateEventController = async (req, res) => {
 
         const eventBody = req.body;
 
-        const result = await eventModel.findByIdAndUpdate(id, eventBody, {
-            new: true,
-        });
+        const result = await eventModel
+            .findByIdAndUpdate(id, eventBody, {
+                new: true,
+            })
+            .select("-createdAt -updatedAt -__v");
 
         return res.status(200).json({
             success: true,

@@ -17,6 +17,7 @@ export const validateToken = async (req, res, next) => {
 
         req.user = result;
 
+        // console.log("req.user", req.user);
         next();
     } catch (error) {
         return next(handleError(400, `Invalid Credentials!`));
