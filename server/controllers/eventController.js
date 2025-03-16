@@ -50,6 +50,16 @@ export const createEventController = async (req, res, next) => {
             return next(handleError(400, `All fields are required!`));
         }
 
+        const existingCreatedEvent = await eventModel.findOne({
+            eventName,
+            eventPinCode,
+            eventDate,
+        });
+
+        if (existingCreatedEvent) {
+            return next(handleError(400, `Already Event ${eventName} exists`));
+        }
+
         const result = await eventModel.create({
             eventName,
             eventDescription,
