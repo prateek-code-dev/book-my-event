@@ -1,3 +1,4 @@
+import Loading from "@/components/project-components/Loading";
 import { showToast } from "@/helper/showToast";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -7,28 +8,26 @@ import { useNavigate } from "react-router-dom";
 const ProtectedRoute = ({ children, userType }) => {
     const { _id, isAdmin } =
         useSelector((state) => state.auth?.data?.data) || {};
-
-    // console.log("_id:", _id, "isAdmin:", isAdmin);
-
+    const loading = useSelector((state) => state.auth.loading);
     const navigate = useNavigate();
-    const [protectedPageAccess, setProtectedPageAccess] = useState(false);
+
+    const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
         const validateUser = async () => {
+            if (!_id) {
+                navigate("/login");
+                showToast("error", "Unauthorized! Please log in.");
+                return;
+            }
+
+            if (userType === "admin" && !isAdmin) {
+                navigate("/login");
+                showToast("error", "Unauthorized! Admin access required!");
+                return;
+            }
+
             try {
-                // If _id is not defined, user is not logged in, so redirect.
-                if (!_id) {
-                    navigate("/login");
-                    showToast("error", "Unauthorized! Please log in.");
-                    return;
-                }
-
-                if (userType === "admin" && !isAdmin) {
-                    navigate("/login");
-                    showToast("error", `Unauthorized! Admin access!`);
-                    return;
-                }
-
                 const result = await axios.get(
                     `http://localhost:5500/v1/user/user-details/${_id}`,
                     { withCredentials: true }
@@ -37,23 +36,24 @@ const ProtectedRoute = ({ children, userType }) => {
                 if (!result.data.success) {
                     navigate("/login");
                     showToast("error", "Unauthorized! Invalid credentials!");
-                    return;
                 }
-
-                // If all checks pass, allow access to the protected page.
-                setProtectedPageAccess(true);
             } catch (error) {
                 console.error("User validation failed:", error);
                 navigate("/login");
                 showToast("error", "Unauthorized! Please log in.");
+            } finally {
+                setIsChecking(false);
             }
         };
 
         validateUser();
-    }, [isAdmin, userType]);
+    }, [_id, isAdmin, userType, navigate]);
 
-    // Render children only if access is granted
-    return <>{protectedPageAccess ? children : null}</>;
+    if (loading || isChecking) {
+        return <Loading />;
+    }
+
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;

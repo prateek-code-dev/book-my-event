@@ -4,8 +4,7 @@ import { Link } from "react-router-dom";
 const HomePage = () => {
     return (
         <div>
-            <Link to={"/admin/create-event"}>Create Event</Link>
-            <Link to={"/admin/all-event"}>Display All Event</Link>
+            <p className="text-3xl font-bold ">Welcome</p>
         </div>
     );
 };

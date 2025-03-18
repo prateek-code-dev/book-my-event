@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdModeEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const DisplayAllEventsPage = () => {
     const { loading, data } = useSelector((state) => state?.event) || {};
@@ -59,10 +60,16 @@ const DisplayAllEventsPage = () => {
 
     return (
         <>
-            <div>
+            <div className="flex items-center justify-between ">
                 <h1 className="text-3xl font-bold text-gray-800 p-2">
                     All Events
                 </h1>
+                <Button
+                    className="p-4 text-xl"
+                    onClick={() => navigate("/admin/create-event")}
+                >
+                    Create Event
+                </Button>
             </div>
             <div>
                 {loading && (

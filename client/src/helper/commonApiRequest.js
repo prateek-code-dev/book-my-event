@@ -38,7 +38,7 @@ export const commonApiRequest = async (
         // console.log("config:", config);
         const response = await axios(config);
 
-        console.log("response: from commonApiRequest", response);
+        // console.log("response: from commonApiRequest", response);
 
         return response.data;
     } catch (error) {

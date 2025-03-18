@@ -1,52 +1,89 @@
-import React from "react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import Loading from "./Loading";
+import { Link } from "react-router-dom";
 
-const sideMenuItems = [
+const userSideBarItemsList = [
     {
-        icon: "",
         name: "Home",
-        path: "/home",
-        isActive: false,
-        adminAccessOnly: false,
+        icon: "",
+        path: "/",
     },
     {
-        icon: "",
-        name: "Events",
-        path: "/admin/events",
-        isActive: false,
-        adminAccessOnly: true,
-    },
-    {
-        icon: "",
         name: "Bookings",
+        icon: "",
         path: "/bookings",
-        isActive: false,
-        adminAccessOnly: false,
     },
     {
+        name: "Reports",
         icon: "",
-        name: "Bookings",
-        path: "/admin/users",
-        isActive: false,
-        adminAccessOnly: true,
+        path: "/report",
     },
     {
-        icon: "",
-        name: "Bookings",
-        path: "/admin/reports",
-        isActive: false,
-        adminAccessOnly: true,
-    },
-    {
-        icon: "",
         name: "Logout",
-        path: "/logout",
-        isActive: false,
-        adminAccessOnly: true,
+        icon: "",
+        path: "/",
     },
 ];
 
-const sideBar = () => {
-    return <div>sideBar</div>;
+const adminSideBarItemsList = [
+    {
+        name: "Home",
+        icon: "",
+        path: "/",
+    },
+    {
+        name: "Events",
+        icon: "",
+        path: "/admin/all-event",
+    },
+    {
+        name: "Bookings",
+        icon: "",
+        path: "/admin/bookings",
+    },
+    {
+        name: "Reports",
+        icon: "",
+        path: "/admin/reports",
+    },
+    {
+        name: "Logout",
+        icon: "",
+        path: "/",
+    },
+];
+
+const SideBar = () => {
+    const userData = useSelector((state) => state?.auth);
+    // console.log("userData", userData);
+
+    const adminUser = userData?.data?.data?.isAdmin;
+    // console.log("adminUser", adminUser);
+
+    const retailUser = userData?.data?.data?.isAdmin === false;
+
+    return (
+        <>
+            <div className="bg-red-200 w-full h-screen">
+                {adminUser &&
+                    adminSideBarItemsList &&
+                    adminSideBarItemsList.length > 0 &&
+                    adminSideBarItemsList.map((item, index) => (
+                        <div key={index}>
+                            <Link to={item.path}>{item.name}</Link>
+                        </div>
+                    ))}
+
+                {retailUser &&
+                    userSideBarItemsList &&
+                    userSideBarItemsList.length > 0 &&
+                    userSideBarItemsList.map((item, index) => (
+                        <div key={index}>{item.name}</div>
+                    ))}
+            </div>
+        </>
+    );
 };
 
-export default sideBar;
+export default SideBar;
