@@ -20,6 +20,15 @@ export const getAllEventsRequest = async (postData, header = false) => {
     );
 };
 
+export const getEventDetailsRequest = async (id, header) => {
+    return commonApiRequest(
+        `${BASE_URL}/v1/event/event-details/${id}`,
+        "GET",
+        "",
+        (header = false)
+    );
+};
+
 export const updateEventRequest = async (postData, id, header = false) => {
     return commonApiRequest(
         `${BASE_URL}/v1/event/update-event/${id}`,

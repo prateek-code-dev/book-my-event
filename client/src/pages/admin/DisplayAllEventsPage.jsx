@@ -59,8 +59,8 @@ const DisplayAllEventsPage = () => {
     };
 
     return (
-        <>
-            <div className="flex items-center justify-between ">
+        <div className="w-full">
+            <div className="flex items-center justify-between px-2">
                 <h1 className="text-3xl font-bold text-gray-800 p-2">
                     All Events
                 </h1>
@@ -71,7 +71,8 @@ const DisplayAllEventsPage = () => {
                     Create Event
                 </Button>
             </div>
-            <div>
+
+            <div className="pt-4">
                 {loading && (
                     <div className="h-screen w-screen flex items-center justify-center">
                         <Loading />
@@ -90,8 +91,7 @@ const DisplayAllEventsPage = () => {
                                 <TableHead>Address</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead>Time</TableHead>
-                                <TableHead>Organizers</TableHead>
-                                <TableHead>Tickets</TableHead>
+
                                 <TableHead>Action</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -113,32 +113,7 @@ const DisplayAllEventsPage = () => {
                                             )}
                                         </TableCell>
                                         <TableCell>{e.eventTime}</TableCell>
-                                        <TableCell>
-                                            {e.eventOrganizers &&
-                                            e.eventOrganizers.length > 0 ? (
-                                                e.eventOrganizers?.map(
-                                                    (item) => <p>{item}</p>
-                                                )
-                                            ) : (
-                                                <div className="text-center">
-                                                    -
-                                                </div>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {e.eventTickets &&
-                                            e.eventTickets.length > 0 ? (
-                                                e.eventTickets?.price?.map(
-                                                    (item) => (
-                                                        <div>{item.price}</div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <div className="text-center">
-                                                    -
-                                                </div>
-                                            )}
-                                        </TableCell>
+
                                         <TableCell>
                                             <div className="flex gap-4 text-xl">
                                                 <MdModeEdit
@@ -157,7 +132,7 @@ const DisplayAllEventsPage = () => {
                     </Table>
                 )}
             </div>
-        </>
+        </div>
     );
 };
 

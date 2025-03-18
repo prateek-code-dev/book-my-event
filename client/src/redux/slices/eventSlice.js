@@ -1,6 +1,7 @@
 import {
     createEventRequest,
     getAllEventsRequest,
+    getEventDetailsRequest,
     updateEventRequest,
 } from "@/services/eventsApi";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
@@ -31,11 +32,25 @@ export const getAllEventsFunction = createAsyncThunk(
     }
 );
 
+export const getEventDetailFunction = createAsyncThunk(
+    "getEventDetails",
+    async (id) => {
+        // console.log("id", id);
+        try {
+            const response = await getEventDetailsRequest(id);
+
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+);
+
 export const updateEventFunction = createAsyncThunk(
     "updateEvent",
     async ({ postData, id }) => {
-        console.log("postData", postData);
-        console.log("id", id);
+        // console.log("postData", postData);
+        // console.log("id", id);
         try {
             const response = await updateEventRequest(postData, id);
 
@@ -54,6 +69,7 @@ export const eventsSlice = createSlice({
         lastCreatedEventData: [],
         allEventsData: [],
         lastUpdatedEvent: [],
+        singleEventData: [],
     },
     extraReducers: (builder) => {
         builder
@@ -80,6 +96,18 @@ export const eventsSlice = createSlice({
                     (state.error = null);
             })
             .addCase(getAllEventsFunction.rejected, (state, action) => {
+                (state.loading = false), (state.error = action.payload);
+            })
+
+            //GET SINGLE EVENT (getEventDetailFunction)
+            .addCase(getEventDetailFunction.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(getEventDetailFunction.fulfilled, (state, action) => {
+                (state.loading = false),
+                    (state.singleEventData = action.payload);
+            })
+            .addCase(getEventDetailFunction.rejected, (state, action) => {
                 (state.loading = false), (state.error = action.payload);
             })
 

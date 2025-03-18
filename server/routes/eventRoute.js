@@ -10,12 +10,7 @@ import { adminAuthorizeMiddleware } from "../middleware/adminAuthorize.js";
 
 export const eventRouter = Router();
 
-eventRouter.get(
-    "/all-events",
-    validateToken,
-    adminAuthorizeMiddleware,
-    getAllEventsController
-);
+eventRouter.get("/all-events", validateToken, getAllEventsController);
 
 eventRouter.post(
     "/create-event",
@@ -24,12 +19,7 @@ eventRouter.post(
     createEventController
 );
 
-eventRouter.get(
-    "/event-details/:id",
-    validateToken,
-    adminAuthorizeMiddleware,
-    getEventDetailsController
-);
+eventRouter.get("/event-details/:id", validateToken, getEventDetailsController);
 
 eventRouter.put(
     "/update-event/:id",

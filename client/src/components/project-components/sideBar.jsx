@@ -65,12 +65,12 @@ const SideBar = () => {
 
     return (
         <>
-            <div className="bg-red-200 w-full h-screen">
+            <div className="bg-red-200 w-full h-screen px-4 py-6 text-xl font-semibold gap-4">
                 {adminUser &&
                     adminSideBarItemsList &&
                     adminSideBarItemsList.length > 0 &&
                     adminSideBarItemsList.map((item, index) => (
-                        <div key={index}>
+                        <div key={index} className="p-2">
                             <Link to={item.path}>{item.name}</Link>
                         </div>
                     ))}
@@ -79,7 +79,9 @@ const SideBar = () => {
                     userSideBarItemsList &&
                     userSideBarItemsList.length > 0 &&
                     userSideBarItemsList.map((item, index) => (
-                        <div key={index}>{item.name}</div>
+                        <div key={index} className="p-2">
+                            <Link to={item.path}>{item.name}</Link>
+                        </div>
                     ))}
             </div>
         </>

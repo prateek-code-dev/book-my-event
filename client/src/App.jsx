@@ -9,6 +9,7 @@ import CreateEventsPage from "./pages/admin/CreateEventsPage";
 import DisplayAllEventsPage from "./pages/admin/DisplayAllEventsPage";
 import EditEventsPage from "./pages/admin/EditEventsPage";
 import Layout from "./Layout/Layout.jsx";
+import EventDetails from "./pages/EventDetails";
 
 const App = () => {
     return (
@@ -39,6 +40,14 @@ const App = () => {
                             element={
                                 <ProtectedRoute>
                                     <HomePage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/event/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <EventDetails />
                                 </ProtectedRoute>
                             }
                         />
