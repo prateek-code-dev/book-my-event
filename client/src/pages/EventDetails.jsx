@@ -8,7 +8,6 @@ import { IoIosTime } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const EventDetails = () => {
@@ -23,8 +22,10 @@ const EventDetails = () => {
 
     const { loading } = useSelector((state) => state?.event) || false;
     // console.log("loading", loading);
+    // console.log("eventDetail", eventDetail);
 
-    console.log("eventDetail", eventDetail);
+    const [selectedTicketType, setSelectedTicketType] = useState(null);
+    const [bookingTicketCount, setBookingTicketCount] = useState(null);
 
     useEffect(() => {
         const fetchEventDetails = async () => {
@@ -44,6 +45,16 @@ const EventDetails = () => {
             fetchEventDetails();
         }
     }, []);
+
+    const handleSelectedTicketType = (item) => {
+        // console.log("item", item);
+
+        setSelectedTicketType(item);
+    };
+
+    const handleBookNow = () => {
+        console.log(`Book now!`);
+    };
 
     return (
         <div className="w-full">
@@ -153,19 +164,28 @@ const EventDetails = () => {
                             Select ticket type
                         </p>
 
-                        <div className="flex gap-4 py-4">
+                        <div className="flex gap-4 py-4 ">
                             {eventDetail?.eventTickets &&
                                 eventDetail.eventTickets.length > 0 &&
                                 eventDetail.eventTickets.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="bg-gray-200 p-2 w-full rounded-2xl cursor-pointer hover:bg-gray-400"
+                                        className={`bg-gray-200 p-2 w-full rounded-2xl cursor-pointer ${
+                                            selectedTicketType === item
+                                                ? "bg-gray-400 border-2 border-black "
+                                                : ""
+                                        }`}
                                     >
                                         <p className="text-xl py-2">
                                             {item.name}
                                         </p>
 
-                                        <div className="flex items-center justify-between">
+                                        <div
+                                            className={`flex items-center justify-between`}
+                                            onClick={() =>
+                                                handleSelectedTicketType(item)
+                                            }
+                                        >
                                             <p className="font-bold py-2">{`$ ${item.price}`}</p>
                                             <p className="font-bold py-2">{`${item.limit} left`}</p>
                                         </div>
@@ -176,7 +196,17 @@ const EventDetails = () => {
                         <div className="py-4">
                             <p>Select tickets count</p>
 
-                            <Input className="my-4" placeHolder="1" />
+                            <input
+                                className="my-4 border-2 w-full rounded-2xl p-2"
+                                type="number"
+                                placeholder="Ticket count"
+                                min={1}
+                                max={selectedTicketType?.limit}
+                                disabled={!selectedTicketType}
+                                onChange={(e) =>
+                                    setBookingTicketCount(e.target.value)
+                                }
+                            />
                         </div>
                     </div>
 
@@ -187,7 +217,16 @@ const EventDetails = () => {
                         </div>
 
                         <div>
-                            <Button className="text-xl cursor-pointer">
+                            <Button
+                                className="text-xl cursor-pointer"
+                                disabled={
+                                    !selectedTicketType ||
+                                    !bookingTicketCount ||
+                                    bookingTicketCount <=
+                                        selectedTicketType?.limit
+                                }
+                                onClick={handleBookNow}
+                            >
                                 Book Now
                             </Button>
                         </div>

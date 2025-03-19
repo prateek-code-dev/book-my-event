@@ -65,7 +65,7 @@ const SideBar = () => {
 
     return (
         <>
-            <div className="bg-red-200 w-full h-screen px-4 py-6 text-xl font-semibold gap-4">
+            <div className="bg-gray-200 w-full h-screen px-4 py-6 text-xl font-semibold gap-4">
                 {adminUser &&
                     adminSideBarItemsList &&
                     adminSideBarItemsList.length > 0 &&

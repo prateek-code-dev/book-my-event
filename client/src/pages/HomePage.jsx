@@ -11,6 +11,7 @@ import { IoIosTime } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
 import { MdDateRange } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import DateSelector from "@/components/project-components/DateSelector";
 
 const HomePage = () => {
     const [allEventsData, setAllEventsData] = useState([]);
@@ -49,20 +50,18 @@ const HomePage = () => {
                 <p className="text-2xl font-bold">Welcome {name}</p>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2  w-full">
                 <Input
-                    className="cursor-pointer"
+                    className="cursor-pointer w-full"
                     placeHolder="Event Name"
                     type="text"
                     name="eventName"
                 />
-                <Input
-                    className="cursor-pointer"
-                    placeHolder="dd-mm-yyyy"
-                    type="date"
+                <DateSelector
+                    className="cursor-pointer bg-amber-700 w-1/5"
                     name="eventDate"
                 />
-                '
+
                 <Button className="cursor-pointer text-lg">
                     Clear Filters
                 </Button>
