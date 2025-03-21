@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { dbConnect } from "./config/db.js";
 import { userRouter } from "./routes/userRoute.js";
 import { eventRouter } from "./routes/eventRoute.js";
+import { razorPayPaymentRouter } from "./routes/razorPayRoute.js";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(
 
 app.use("/v1/user/", userRouter);
 app.use("/v1/event/", eventRouter);
+app.use("/v1/payment/", razorPayPaymentRouter);
 
 dbConnect();
 

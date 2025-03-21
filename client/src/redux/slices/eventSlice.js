@@ -14,7 +14,7 @@ export const createEventFunction = createAsyncThunk(
             // console.log("response from createEventFunction", response);
             return response;
         } catch (error) {
-            throw error;
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
         }
     }
 );
@@ -27,7 +27,7 @@ export const getAllEventsFunction = createAsyncThunk(
 
             return response;
         } catch (error) {
-            throw error;
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
         }
     }
 );
@@ -41,7 +41,7 @@ export const getEventDetailFunction = createAsyncThunk(
 
             return response;
         } catch (error) {
-            throw error;
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
         }
     }
 );
@@ -56,7 +56,7 @@ export const updateEventFunction = createAsyncThunk(
 
             return response;
         } catch (error) {
-            throw error;
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
         }
     }
 );

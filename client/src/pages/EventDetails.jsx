@@ -9,8 +9,15 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import {
+    createPaymentOrderDispatchFunction,
+    verifyPaymentDispatchFunction,
+} from "@/redux/slices/paymentSlice";
 
 const EventDetails = () => {
+    const { name, email } =
+        useSelector((state) => state?.auth?.data?.data) || {};
+
     const [eventDetail, setEventDetail] = useState(null);
 
     const dispatch = useDispatch();
@@ -24,8 +31,12 @@ const EventDetails = () => {
     // console.log("loading", loading);
     // console.log("eventDetail", eventDetail);
 
+    const [paymentLoading, setPaymentLoading] = useState(false);
+
     const [selectedTicketType, setSelectedTicketType] = useState(null);
     const [bookingTicketCount, setBookingTicketCount] = useState(null);
+
+    const totalAmount = selectedTicketType?.price * bookingTicketCount;
 
     useEffect(() => {
         const fetchEventDetails = async () => {
@@ -52,8 +63,122 @@ const EventDetails = () => {
         setSelectedTicketType(item);
     };
 
-    const handleBookNow = () => {
-        console.log(`Book now!`);
+    const handleBookNow = async (e) => {
+        e.preventDefault();
+
+        const bookingData = {
+            amount: totalAmount,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+            notes: {
+                customerName: name,
+                customerEmail: email,
+                productName: selectedTicketType?.name,
+                productQuantity: bookingTicketCount,
+            },
+        };
+
+        try {
+            setPaymentLoading(true);
+
+            // Create order
+            const result = await dispatch(
+                createPaymentOrderDispatchFunction(bookingData)
+            ).unwrap();
+
+            console.log("Order created:", result);
+
+            if (!result.success) {
+                showToast("error", `Order creation failed: ${result?.message}`);
+                return;
+            }
+
+            const { data } = result;
+
+            // Verify Razorpay is available
+            if (!window.Razorpay) {
+                console.error("Razorpay SDK not available");
+                showToast("error", "Payment gateway not available");
+                return;
+            }
+
+            // Define verification function
+            const verifyPayment = async (paymentId, orderId, signature) => {
+                try {
+                    console.log("Verifying payment with:", {
+                        paymentId,
+                        orderId,
+                        signature,
+                    });
+
+                    const verificationResponse = await dispatch(
+                        verifyPaymentDispatchFunction({
+                            razorpay_payment_id: paymentId,
+                            razorpay_order_id: orderId,
+                            razorpay_signature: signature,
+                        })
+                    ).unwrap();
+
+                    console.log("Verification response:", verificationResponse);
+
+                    if (verificationResponse.success) {
+                        showToast("success", "Payment successful!");
+                        // Redirect to confirmation page or update UI
+                    } else {
+                        showToast("error", "Payment verification failed");
+                    }
+                } catch (error) {
+                    console.error("Verification error:", error);
+                    showToast("error", `Verification failed: ${error.message}`);
+                }
+            };
+
+            // Configure Razorpay
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_PAYMENT_KEY,
+                amount: data.amount,
+                currency: data.currency,
+                name: `Book My Events Inc.`,
+                description: data.notes.productName,
+                order_id: data.id,
+                handler: function (response) {
+                    console.log("Payment successful! Response:", response);
+                    // This is called after payment completes successfully
+                    verifyPayment(
+                        response.razorpay_payment_id,
+                        response.razorpay_order_id,
+                        response.razorpay_signature
+                    );
+                },
+                prefill: {
+                    name: data.notes.customerName,
+                    email: data.notes.customerEmail,
+                },
+                notes: data.notes,
+                theme: {
+                    color: "#3399cc",
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log("Payment modal dismissed");
+                        setPaymentLoading(false);
+                    },
+                },
+            };
+
+            // Open Razorpay
+            console.log("Opening Razorpay with options:", options);
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            console.error("Payment process error:", error);
+            showToast(
+                "error",
+                `Error: ${error.message || JSON.stringify(error)}`
+            );
+        } finally {
+            setPaymentLoading(false);
+        }
     };
 
     return (
@@ -102,7 +227,7 @@ const EventDetails = () => {
                         {eventDetail?.eventDescription}
                     </div>
 
-                    <div className="bg-gray-200 w-full rounded-xl py-4">
+                    <div className="bg-gray-200 dark:bg-gray-700 w-full rounded-xl py-4">
                         <div className="flex items-center justify-between px-2 py-2">
                             <div className="w-full">
                                 <p className="text-gray-600">Organizer</p>
@@ -212,8 +337,14 @@ const EventDetails = () => {
 
                     <div className="bg-gray-200 p-4 rounded-2xl flex items-center justify-between gap-4">
                         <div>
-                            <p className="">Total Amount: </p>
-                            <p className="font-bold">$ 0</p>
+                            {selectedTicketType && bookingTicketCount && (
+                                <>
+                                    <p className="">Total Amount: </p>
+                                    <p className="font-bold">
+                                        Rs. {totalAmount}
+                                    </p>
+                                </>
+                            )}
                         </div>
 
                         <div>
@@ -222,8 +353,12 @@ const EventDetails = () => {
                                 disabled={
                                     !selectedTicketType ||
                                     !bookingTicketCount ||
-                                    bookingTicketCount <=
-                                        selectedTicketType?.limit
+                                    bookingTicketCount === null ||
+                                    (selectedTicketType?.available
+                                        ? bookingTicketCount >
+                                          selectedTicketType?.available
+                                        : bookingTicketCount >
+                                          selectedTicketType?.limit)
                                 }
                                 onClick={handleBookNow}
                             >

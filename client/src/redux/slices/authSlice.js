@@ -11,9 +11,7 @@ export const loginDispatchFunction = createAsyncThunk(
 
             return response;
         } catch (error) {
-            console.log("error", error);
-            const errorMessage = error || "Login failed. Please try again.";
-            return thunkAPI.rejectWithValue(errorMessage);
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
         }
     }
 );
@@ -26,9 +24,7 @@ export const registerDispatchFunction = createAsyncThunk(
 
             return response;
         } catch (error) {
-            console.log("error", error);
-            const errorMessage = error || "Register failed. Please try again.";
-            return thunkAPI.rejectWithValue(errorMessage);
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
         }
     }
 );

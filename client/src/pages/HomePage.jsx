@@ -50,9 +50,6 @@ const HomePage = () => {
             <ThemeToggle />
             <div className="flex-col gap-4 p-2">
                 <p className="text-2xl font-bold">Welcome {name}</p>
-                <p className="bg-background text-foreground dark:bg-red-400 dark:text-blue-300 text-2xl font-bold">
-                    Welcome {name}
-                </p>
             </div>
 
             <div className="flex gap-2  w-full">
