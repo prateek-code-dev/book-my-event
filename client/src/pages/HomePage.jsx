@@ -12,6 +12,7 @@ import { FaLocationDot } from "react-icons/fa6";
 import { MdDateRange } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import DateSelector from "@/components/project-components/DateSelector";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const HomePage = () => {
     const [allEventsData, setAllEventsData] = useState([]);
@@ -46,8 +47,12 @@ const HomePage = () => {
 
     return (
         <div>
+            <ThemeToggle />
             <div className="flex-col gap-4 p-2">
                 <p className="text-2xl font-bold">Welcome {name}</p>
+                <p className="bg-background text-foreground dark:bg-red-400 dark:text-blue-300 text-2xl font-bold">
+                    Welcome {name}
+                </p>
             </div>
 
             <div className="flex gap-2  w-full">
