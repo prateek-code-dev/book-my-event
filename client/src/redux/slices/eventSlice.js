@@ -9,7 +9,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export const createEventFunction = createAsyncThunk(
   "createEvent",
-  async (postData) => {
+  async (postData, thunkAPI) => {
     try {
       const response = await createEventRequest(postData);
       // console.log("response from createEventFunction", response);
@@ -22,7 +22,7 @@ export const createEventFunction = createAsyncThunk(
 
 export const getAllEventsFunction = createAsyncThunk(
   "getAllEvents",
-  async () => {
+  async (thunkAPI) => {
     try {
       const response = await getAllEventsRequest();
 
@@ -35,7 +35,7 @@ export const getAllEventsFunction = createAsyncThunk(
 
 export const getEventDetailFunction = createAsyncThunk(
   "getEventDetails",
-  async (id) => {
+  async (id, thunkAPI) => {
     // console.log("id", id);
     try {
       const response = await getEventDetailsRequest(id);

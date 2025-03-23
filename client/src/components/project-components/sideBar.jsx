@@ -12,7 +12,7 @@ const userSideBarItemsList = [
   {
     name: "Bookings",
     icon: "",
-    path: "/bookings",
+    path: "/booking",
   },
   {
     name: "Reports",
@@ -40,7 +40,7 @@ const adminSideBarItemsList = [
   {
     name: "Bookings",
     icon: "",
-    path: "/admin/bookings",
+    path: "/admin/booking",
   },
   {
     name: "Reports",

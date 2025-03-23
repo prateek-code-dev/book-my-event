@@ -9,7 +9,8 @@ import CreateEventsPage from "./pages/admin/CreateEventsPage";
 import DisplayAllEventsPage from "./pages/admin/DisplayAllEventsPage";
 import EditEventsPage from "./pages/admin/EditEventsPage";
 import Layout from "./Layout/Layout.jsx";
-import EventDetails from "./pages/EventDetails";
+import EventDetailsPage from "./pages/EventDetailsPage";
+import BookingPage from "./pages/BookingPage";
 
 const App = () => {
   return (
@@ -47,7 +48,15 @@ const App = () => {
               path="/event/:id"
               element={
                 <ProtectedRoute>
-                  <EventDetails />
+                  <EventDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/booking"
+              element={
+                <ProtectedRoute>
+                  <BookingPage />
                 </ProtectedRoute>
               }
             />

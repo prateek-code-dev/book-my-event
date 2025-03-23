@@ -13,8 +13,9 @@ import {
   createPaymentOrderDispatchFunction,
   verifyPaymentDispatchFunction,
 } from "@/redux/slices/paymentSlice";
+import { createBookingFunction } from "@/redux/slices/bookingSlice";
 
-const EventDetails = () => {
+const EventDetailsPage = () => {
   const { name, email } = useSelector((state) => state?.auth?.data?.data) || {};
 
   const [eventDetail, setEventDetail] = useState(null);
@@ -28,15 +29,17 @@ const EventDetails = () => {
 
   const { loading } = useSelector((state) => state?.event) || false;
   // console.log("loading", loading);
-  console.log("eventDetail", eventDetail);
+  // console.log("eventDetail", eventDetail);
 
   const [paymentLoading, setPaymentLoading] = useState(false);
 
   const [selectedTicketType, setSelectedTicketType] = useState(null);
   const [bookingTicketCount, setBookingTicketCount] = useState(null);
-  console.log("selectedTicketType", selectedTicketType);
+  // console.log("selectedTicketType", selectedTicketType);
 
   const totalAmount = selectedTicketType?.price * bookingTicketCount;
+
+  let paymentDetails = "";
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -57,12 +60,31 @@ const EventDetails = () => {
     }
   }, []);
 
-  const createBooking = async (paymentSuccessData) => {
-    console.log("paymentSuccessData", paymentSuccessData);
+  const createBooking = async () => {
+    const bookingData = {
+      event: eventDetail?._id,
+      ticketType: selectedTicketType?.name,
+      ticketCount: Number(bookingTicketCount),
+      totalAmount: totalAmount,
+      paymentId: paymentDetails,
+    };
 
+    // console.log("bookingData", bookingData);
     try {
-      const result = await 1;
-    } catch (error) {}
+      const result = await dispatch(
+        createBookingFunction(bookingData),
+      ).unwrap();
+
+      if (!result) {
+        showToast("error", `Error! ${result?.message}`);
+      }
+
+      showToast("success", `Success! ${result?.message}`);
+
+      navigate("/booking");
+    } catch (error) {
+      showToast("error", `Error! ${error}`);
+    }
   };
 
   const handleSelectedTicketType = (item) => {
@@ -98,7 +120,7 @@ const EventDetails = () => {
         createPaymentOrderDispatchFunction(bookingData),
       ).unwrap();
 
-      console.log("Order created:", result);
+      // console.log("Order created:", result);
 
       if (!result.success) {
         showToast("error", `Order creation failed: ${result?.message}`);
@@ -117,11 +139,11 @@ const EventDetails = () => {
       // Define verification function
       const verifyPayment = async (paymentId, orderId, signature) => {
         try {
-          console.log("Verifying payment with:", {
-            paymentId,
-            orderId,
-            signature,
-          });
+          // console.log("Verifying payment with:", {
+          //     paymentId,
+          //     orderId,
+          //     signature,
+          // });
 
           const verificationResponse = await dispatch(
             verifyPaymentDispatchFunction({
@@ -131,13 +153,13 @@ const EventDetails = () => {
             }),
           ).unwrap();
 
-          console.log("Verification response:", verificationResponse);
+          // console.log("Verification response:", verificationResponse);
 
           if (verificationResponse.success) {
             showToast("success", "Payment successful!");
             // Redirect to confirmation page or update UI
 
-            await createBooking(verificationResponse);
+            await createBooking();
           } else {
             showToast("error", "Payment verification failed");
           }
@@ -156,8 +178,10 @@ const EventDetails = () => {
         description: data.notes.productName,
         order_id: data.id,
         handler: function (response) {
-          console.log("Payment successful! Response:", response);
+          // console.log("Payment successful! Response:", response);
           // This is called after payment completes successfully
+          paymentDetails = response.razorpay_payment_id;
+
           verifyPayment(
             response.razorpay_payment_id,
             response.razorpay_order_id,
@@ -174,14 +198,14 @@ const EventDetails = () => {
         },
         modal: {
           ondismiss: function () {
-            console.log("Payment modal dismissed");
+            // console.log("Payment modal dismissed");
             setPaymentLoading(false);
           },
         },
       };
 
       // Open Razorpay
-      console.log("Opening Razorpay with options:", options);
+      // console.log("Opening Razorpay with options:", options);
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     } catch (error) {
@@ -376,4 +400,4 @@ const EventDetails = () => {
   );
 };
 
-export default EventDetails;
+export default EventDetailsPage;
