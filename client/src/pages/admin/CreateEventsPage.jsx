@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { showToast } from "@/helper/showToast";
 import { createEventFunction } from "@/redux/slices/eventSlice";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -95,14 +95,18 @@ const CreateEventsPage = () => {
   const ticketListHandle = (e) => {
     const updatedTicketList = [...ticketList, singleTicket];
 
-    // console.log("updatedTicketList", updatedTicketList);
+    console.log("updatedTicketList", updatedTicketList);
 
     setTicketList(updatedTicketList);
 
-    setFormData({ ...formData, eventTickets: ticketList });
+    // console.log("ticketList", ticketList);
+
+    setFormData({ ...formData, eventTickets: updatedTicketList });
 
     setSingleTicket({ name: "", price: 0, limit: 0 });
   };
+
+  // console.log("formData", formData);
 
   const ticketsRemoveHandle = (index) => {
     // console.log("index", index);
@@ -119,6 +123,13 @@ const CreateEventsPage = () => {
 
     setFormData({ ...formData, eventDate: isoDate });
   };
+
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      eventTickets: ticketList,
+    }));
+  }, [ticketList]);
 
   return (
     <>
@@ -303,7 +314,7 @@ const CreateEventsPage = () => {
               onChange={(e) =>
                 setSingleTicket({
                   ...singleTicket,
-                  [e.target.name]: e.target.value,
+                  [e.target.name]: Number(e.target.value),
                 })
               }
             />
@@ -316,7 +327,7 @@ const CreateEventsPage = () => {
               onChange={(e) =>
                 setSingleTicket({
                   ...singleTicket,
-                  [e.target.name]: e.target.value,
+                  [e.target.name]: Number(e.target.value),
                 })
               }
             />
