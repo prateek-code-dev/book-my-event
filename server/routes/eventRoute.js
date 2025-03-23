@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
     createEventController,
+    deleteEventController,
     getAllEventsController,
     getEventDetailsController,
     updateEventController,
@@ -26,4 +27,11 @@ eventRouter.put(
     validateToken,
     adminAuthorizeMiddleware,
     updateEventController
+);
+
+eventRouter.delete(
+    "/delete-event/:id",
+    validateToken,
+    adminAuthorizeMiddleware,
+    deleteEventController
 );

@@ -9,7 +9,10 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { showToast } from "@/helper/showToast";
-import { getAllEventsFunction } from "@/redux/slices/eventSlice";
+import {
+    deleteEventFunction,
+    getAllEventsFunction,
+} from "@/redux/slices/eventSlice";
 import moment from "moment";
 
 import React, { useEffect, useState } from "react";
@@ -19,6 +22,8 @@ import { MdModeEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { set } from "date-fns";
+import Modal from "@/components/project-components/Modal";
 
 const DisplayAllEventsPage = () => {
     const { loading, data } = useSelector((state) => state?.event) || {};
@@ -29,23 +34,25 @@ const DisplayAllEventsPage = () => {
 
     const [eventsData, setEventsData] = useState([]);
 
-    useEffect(() => {
-        const getAllEventsData = async () => {
-            try {
-                const response = await dispatch(
-                    getAllEventsFunction()
-                ).unwrap();
+    const [modalOpen, setModalOpen] = useState(false);
 
-                if (!response.success) {
-                    showToast("error", response.message || `Error`);
-                }
+    const [deleteEvent, setDeleteEvent] = useState(null);
 
-                setEventsData(response.data);
-            } catch (error) {
-                showToast("error", `Error ${error.message}`);
+    const getAllEventsData = async () => {
+        try {
+            const response = await dispatch(getAllEventsFunction()).unwrap();
+
+            if (!response.success) {
+                showToast("error", response.message || `Error`);
             }
-        };
 
+            setEventsData(response.data);
+        } catch (error) {
+            showToast("error", `Error ${error.message}`);
+        }
+    };
+
+    useEffect(() => {
         getAllEventsData();
     }, []);
 
@@ -56,6 +63,30 @@ const DisplayAllEventsPage = () => {
         // console.log("i", id);
 
         navigate(`/admin/edit-event/${e._id}`);
+    };
+
+    const handleDeleteEvent = async (e) => {
+        e.preventDefault();
+
+        setModalOpen(false);
+
+        try {
+            console.log("deleteEvent", deleteEvent);
+
+            const result = await dispatch(
+                deleteEventFunction(deleteEvent._id)
+            ).unwrap();
+
+            if (!result.success) {
+                showToast("error", `Error! ${result?.message}`);
+            }
+
+            showToast("success", `Success! ${result?.message}`);
+
+            getAllEventsData();
+        } catch (error) {
+            showToast("error", `Error! ${error}`);
+        }
     };
 
     return (
@@ -123,7 +154,13 @@ const DisplayAllEventsPage = () => {
                                                     }
                                                 />
 
-                                                <MdDelete className="text-red-700 hover:text-red-400 cursor-pointer" />
+                                                <MdDelete
+                                                    onClick={() => {
+                                                        setModalOpen(true);
+                                                        setDeleteEvent(e);
+                                                    }}
+                                                    className="text-red-700 hover:text-red-400 cursor-pointer"
+                                                />
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -132,6 +169,12 @@ const DisplayAllEventsPage = () => {
                     </Table>
                 )}
             </div>
+
+            <Modal
+                isOpen={modalOpen}
+                setIsOpen={setModalOpen}
+                handleAction={handleDeleteEvent}
+            />
         </div>
     );
 };

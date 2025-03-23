@@ -29,12 +29,13 @@ const EventDetails = () => {
 
     const { loading } = useSelector((state) => state?.event) || false;
     // console.log("loading", loading);
-    // console.log("eventDetail", eventDetail);
+    console.log("eventDetail", eventDetail);
 
     const [paymentLoading, setPaymentLoading] = useState(false);
 
     const [selectedTicketType, setSelectedTicketType] = useState(null);
     const [bookingTicketCount, setBookingTicketCount] = useState(null);
+    console.log("selectedTicketType", selectedTicketType);
 
     const totalAmount = selectedTicketType?.price * bookingTicketCount;
 
@@ -57,6 +58,14 @@ const EventDetails = () => {
         }
     }, []);
 
+    const createBooking = async (paymentSuccessData) => {
+        console.log("paymentSuccessData", paymentSuccessData);
+
+        try {
+            const result = await 1;
+        } catch (error) {}
+    };
+
     const handleSelectedTicketType = (item) => {
         // console.log("item", item);
 
@@ -77,6 +86,10 @@ const EventDetails = () => {
                 productQuantity: bookingTicketCount,
             },
         };
+
+        if (bookingData.notes.productQuantity == 0) {
+            showToast("error", `Tickets cannot be zero`);
+        }
 
         try {
             setPaymentLoading(true);
@@ -124,6 +137,8 @@ const EventDetails = () => {
                     if (verificationResponse.success) {
                         showToast("success", "Payment successful!");
                         // Redirect to confirmation page or update UI
+
+                        await createBooking(verificationResponse);
                     } else {
                         showToast("error", "Payment verification failed");
                     }
@@ -178,6 +193,27 @@ const EventDetails = () => {
             );
         } finally {
             setPaymentLoading(false);
+        }
+    };
+
+    const ticketCountValidation = () => {
+        if (
+            !selectedTicketType ||
+            !bookingTicketCount ||
+            bookingTicketCount === null ||
+            bookingTicketCount == 0
+        ) {
+            return true;
+        }
+
+        if (bookingTicketCount > Number(selectedTicketType?.limit)) {
+            showToast("error", `Tickets cannot be more than limit`);
+            return true;
+        }
+
+        if (bookingTicketCount > Number(selectedTicketType?.available)) {
+            showToast("error", `Tickets cannot be more than available`);
+            return true;
         }
     };
 
@@ -324,7 +360,8 @@ const EventDetails = () => {
                             <input
                                 className="my-4 border-2 w-full rounded-2xl p-2"
                                 type="number"
-                                placeholder="Ticket count"
+                                // placeholder="Ticket count"
+                                // defaultValue={1}
                                 min={1}
                                 max={selectedTicketType?.limit}
                                 disabled={!selectedTicketType}
@@ -350,16 +387,7 @@ const EventDetails = () => {
                         <div>
                             <Button
                                 className="text-xl cursor-pointer"
-                                disabled={
-                                    !selectedTicketType ||
-                                    !bookingTicketCount ||
-                                    bookingTicketCount === null ||
-                                    (selectedTicketType?.available
-                                        ? bookingTicketCount >
-                                          selectedTicketType?.available
-                                        : bookingTicketCount >
-                                          selectedTicketType?.limit)
-                                }
+                                disabled={ticketCountValidation()}
                                 onClick={handleBookNow}
                             >
                                 Book Now

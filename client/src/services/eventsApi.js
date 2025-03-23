@@ -37,3 +37,10 @@ export const updateEventRequest = async (postData, id, header = false) => {
         (header = false)
     );
 };
+
+export const deleteEventRequest = async (id) => {
+    return commonApiRequest(
+        `${BASE_URL}/v1/event/delete-event/${id}`,
+        "DELETE"
+    );
+};

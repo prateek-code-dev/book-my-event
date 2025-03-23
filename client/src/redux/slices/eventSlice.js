@@ -1,5 +1,6 @@
 import {
     createEventRequest,
+    deleteEventRequest,
     getAllEventsRequest,
     getEventDetailsRequest,
     updateEventRequest,
@@ -48,11 +49,24 @@ export const getEventDetailFunction = createAsyncThunk(
 
 export const updateEventFunction = createAsyncThunk(
     "updateEvent",
-    async ({ postData, id }) => {
+    async ({ postData, id }, thunkAPI) => {
         // console.log("postData", postData);
         // console.log("id", id);
         try {
             const response = await updateEventRequest(postData, id);
+
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
+        }
+    }
+);
+
+export const deleteEventFunction = createAsyncThunk(
+    "deleteEvent",
+    async (id, thunkAPI) => {
+        try {
+            const response = await deleteEventRequest(id);
 
             return response;
         } catch (error) {
@@ -70,6 +84,7 @@ export const eventsSlice = createSlice({
         allEventsData: [],
         lastUpdatedEvent: [],
         singleEventData: [],
+        lastDeletedEventData: [],
     },
     extraReducers: (builder) => {
         builder
@@ -121,6 +136,18 @@ export const eventsSlice = createSlice({
                     (state.error = null);
             })
             .addCase(updateEventFunction.rejected, (state, action) => {
+                (state.loading = false), (state.error = action.payload);
+            })
+
+            //DELETE EVENT (deleteEventFunction)
+            .addCase(deleteEventFunction.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(deleteEventFunction.fulfilled, (state, action) => {
+                (state.loading = false),
+                    (state.lastDeletedEventData = action.payload);
+            })
+            .addCase(deleteEventFunction.rejected, (state, action) => {
                 (state.loading = false), (state.error = action.payload);
             });
     },

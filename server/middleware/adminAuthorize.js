@@ -4,7 +4,7 @@ export const adminAuthorizeMiddleware = async (req, res, next) => {
     try {
         const userDetails = req.user;
 
-        console.log("userDetails", userDetails);
+        // console.log("userDetails", userDetails);
 
         if (!userDetails.isAdmin) {
             return next(

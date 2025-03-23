@@ -6,6 +6,7 @@ import { dbConnect } from "./config/db.js";
 import { userRouter } from "./routes/userRoute.js";
 import { eventRouter } from "./routes/eventRoute.js";
 import { razorPayPaymentRouter } from "./routes/razorPayRoute.js";
+import { bookingRouter } from "./routes/bookingRoute.js";
 
 dotenv.config();
 
@@ -13,16 +14,19 @@ const app = express();
 app.use(express.json());
 
 app.use(cookieParser());
+
 app.use(
     cors({
         origin: "http://localhost:5173",
         credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     })
 );
 
 app.use("/v1/user/", userRouter);
 app.use("/v1/event/", eventRouter);
 app.use("/v1/payment/", razorPayPaymentRouter);
+app.use("/v1/booking/", bookingRouter);
 
 dbConnect();
 

@@ -166,3 +166,27 @@ export const updateEventController = async (req, res, next) => {
         );
     }
 };
+
+export const deleteEventController = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const result = await eventModel.findByIdAndDelete(id);
+
+        if (!result) {
+            return next(
+                handleError(400, `Error! in deleting event. Try later!`)
+            );
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Event deleted successfully!`,
+            data: result,
+        });
+    } catch (error) {
+        return next(
+            handleError(500, `Internal server error! ${error.message || error}`)
+        );
+    }
+};
