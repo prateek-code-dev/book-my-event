@@ -1,9 +1,9 @@
 import { Router } from "express";
 import {
-    loginController,
-    logoutController,
-    registerController,
-    userDetailsController,
+  loginController,
+  logoutController,
+  registerController,
+  userDetailsController,
 } from "../controllers/userController.js";
 import { validateToken } from "../middleware/validateToken.js";
 

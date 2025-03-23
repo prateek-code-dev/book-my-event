@@ -1,7 +1,7 @@
 import React from "react";
 
 const PublicRoute = ({ children }) => {
-    return <>{children}</>;
+  return <>{children}</>;
 };
 
 export default PublicRoute;

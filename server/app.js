@@ -16,11 +16,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(
-    cors({
-        origin: "http://localhost:5173",
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    })
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  }),
 );
 
 app.use("/v1/user/", userRouter);
@@ -33,22 +33,22 @@ dbConnect();
 const port = process.env.PORT || 5473;
 
 app.get("/", (req, res) => {
-    return res
-        .status(200)
-        .json({ success: true, message: `Welcome to Book My Events Server!` });
+  return res
+    .status(200)
+    .json({ success: true, message: `Welcome to Book My Events Server!` });
 });
 
 app.listen(port, () => {
-    console.log(`Server listening on PORT ${port}`);
+  console.log(`Server listening on PORT ${port}`);
 });
 
 app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
 
-    res.status(statusCode).json({
-        success: false,
-        statusCode,
-        message,
-    });
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+  });
 });

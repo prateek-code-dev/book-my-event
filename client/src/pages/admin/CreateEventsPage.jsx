@@ -12,372 +12,345 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const CreateEventsPage = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [guestName, setGuestName] = useState("");
-    const [guestList, setGuestList] = useState([]);
+  const [guestName, setGuestName] = useState("");
+  const [guestList, setGuestList] = useState([]);
 
-    const [singleTicket, setSingleTicket] = useState({
+  const [singleTicket, setSingleTicket] = useState({
+    name: "",
+    price: "",
+    limit: "",
+  });
+
+  const [ticketList, setTicketList] = useState([]);
+
+  const [formData, setFormData] = useState({
+    eventName: "",
+    eventDescription: "",
+    eventOrganizer: "",
+    eventGuests: [],
+    eventAddress: "",
+    eventCity: "",
+    eventPinCode: "",
+    eventDate: "",
+    eventTime: "",
+    eventMedia: [],
+    eventTickets: [
+      {
         name: "",
-        price: "",
-        limit: "",
-    });
+        price: 0,
+        limit: 0,
+      },
+    ],
+  });
 
-    const [ticketList, setTicketList] = useState([]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const [formData, setFormData] = useState({
-        eventName: "",
-        eventDescription: "",
-        eventOrganizer: "",
-        eventGuests: [],
-        eventAddress: "",
-        eventCity: "",
-        eventPinCode: "",
-        eventDate: "",
-        eventTime: "",
-        eventMedia: [],
-        eventTickets: [
-            {
-                name: "",
-                price: 0,
-                limit: 0,
-            },
-        ],
-    });
+    setFormData({ ...formData, [name]: value });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    // console.log("Form Data", formData);
+  };
 
-        setFormData({ ...formData, [name]: value });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        // console.log("Form Data", formData);
-    };
+    try {
+      const response = await dispatch(createEventFunction(formData)).unwrap();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+      if (response.success) {
+        showToast("success", `Success ${response.message}`);
+        setFormData({});
+        navigate("/admin/all-event");
+      } else {
+        showToast("error", `Error ${response.message}!`);
+      }
+    } catch (error) {
+      console.log("error", error);
+      showToast("error", `Error ${error.message}`);
+    }
+  };
 
-        try {
-            const response = await dispatch(
-                createEventFunction(formData)
-            ).unwrap();
+  const addGuestHandle = (e) => {
+    const updatedGuestList = [...guestList, guestName];
 
-            if (response.success) {
-                showToast("success", `Success ${response.message}`);
-                setFormData({});
-                navigate("/admin/all-event");
-            } else {
-                showToast("error", `Error ${response.message}!`);
-            }
-        } catch (error) {
-            console.log("error", error);
-            showToast("error", `Error ${error.message}`);
-        }
-    };
+    setGuestList(updatedGuestList);
 
-    const addGuestHandle = (e) => {
-        const updatedGuestList = [...guestList, guestName];
+    setFormData({ ...formData, eventGuests: updatedGuestList });
 
-        setGuestList(updatedGuestList);
+    setGuestName("");
+  };
 
-        setFormData({ ...formData, eventGuests: updatedGuestList });
+  const removeGuestNameFromListHandle = (indexToRemove) => {
+    const updatedGuestList = guestList.filter((e, i) => i !== indexToRemove);
 
-        setGuestName("");
-    };
+    setGuestList(updatedGuestList);
 
-    const removeGuestNameFromListHandle = (indexToRemove) => {
-        const updatedGuestList = guestList.filter(
-            (e, i) => i !== indexToRemove
-        );
+    setFormData({ ...formData, eventGuests: updatedGuestList });
+  };
 
-        setGuestList(updatedGuestList);
+  const ticketListHandle = (e) => {
+    const updatedTicketList = [...ticketList, singleTicket];
 
-        setFormData({ ...formData, eventGuests: updatedGuestList });
-    };
+    // console.log("updatedTicketList", updatedTicketList);
 
-    const ticketListHandle = (e) => {
-        const updatedTicketList = [...ticketList, singleTicket];
+    setTicketList(updatedTicketList);
 
-        // console.log("updatedTicketList", updatedTicketList);
+    setFormData({ ...formData, eventTickets: ticketList });
 
-        setTicketList(updatedTicketList);
+    setSingleTicket({ name: "", price: 0, limit: 0 });
+  };
 
-        setFormData({ ...formData, eventTickets: ticketList });
+  const ticketsRemoveHandle = (index) => {
+    // console.log("index", index);
 
-        setSingleTicket({ name: "", price: 0, limit: 0 });
-    };
+    const updatedTicketList = ticketList.filter((e, id) => id !== index);
 
-    const ticketsRemoveHandle = (index) => {
-        // console.log("index", index);
+    setTicketList(updatedTicketList);
+  };
 
-        const updatedTicketList = ticketList.filter((e, id) => id !== index);
+  const handleDateChange = (date) => {
+    // console.log("handleDateChange", date);
 
-        setTicketList(updatedTicketList);
-    };
+    const isoDate = moment(date).toISOString();
 
-    const handleDateChange = (date) => {
-        // console.log("handleDateChange", date);
+    setFormData({ ...formData, eventDate: isoDate });
+  };
 
-        const isoDate = moment(date).toISOString();
+  return (
+    <>
+      <h1 className="text-3xl font-bold text-gray-800 p-2">Create New Event</h1>
+      <div className="flex flex-col gap-4 p-2 w-full">
+        <div className="flex items-center gap-4">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Name <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            required
+            className="border-2 w-full cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Name"
+            name="eventName"
+            type="text"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Description <span className="text-red-500">*</span>
+          </Label>
+          <Textarea
+            required
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Description"
+            name="eventDescription"
+            type="text"
+            onChange={handleChange}
+          />
+        </div>
 
-        setFormData({ ...formData, eventDate: isoDate });
-    };
-
-    return (
-        <>
-            <h1 className="text-3xl font-bold text-gray-800 p-2">
-                Create New Event
-            </h1>
-            <div className="flex flex-col gap-4 p-2 w-full">
-                <div className="flex items-center gap-4">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Name <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        required
-                        className="border-2 w-full cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Name"
-                        name="eventName"
-                        type="text"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Description <span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                        required
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Description"
-                        name="eventDescription"
-                        type="text"
-                        onChange={handleChange}
-                    />
-                </div>
-
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Organizer
-                    </Label>
-                    <Input
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Organizer"
-                        name="eventOrganizer"
-                        type="text"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Guests
-                    </Label>
-                    <div className="flex w-full gap-2">
-                        <Input
-                            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                            placeholder="Enter Event Guests"
-                            value={guestName}
-                            type="text"
-                            onChange={(e) => setGuestName(e.target.value)}
-                        />
-                        <Button onClick={addGuestHandle}>Add Guest</Button>
-                    </div>
-                </div>
-                <div className="flex w-full">
-                    <div className="w-full"></div>
-                    <div className="flex gap-2 w-full">
-                        {guestList &&
-                            guestList.map((e, i) => (
-                                <div
-                                    key={i}
-                                    className="border-2 p-2 flex items-center gap-2 cursor-pointer hover:bg-gray-100"
-                                >
-                                    {e}{" "}
-                                    <IoIosClose
-                                        size={24}
-                                        onClick={() =>
-                                            removeGuestNameFromListHandle(i)
-                                        }
-                                    />
-                                </div>
-                            ))}
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Address <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        required
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Address"
-                        name="eventAddress"
-                        type="text"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event City <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        required
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event City"
-                        name="eventCity"
-                        type="text"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Pincode <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        required
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Pincode"
-                        name="eventPinCode"
-                        type="text"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Date <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="border-2 w-full bg-gray-50">
-                        <DateSelector
-                            required
-                            placeHolderMessage="Select Event Date"
-                            placeholder="Enter Event Date"
-                            name="eventDate"
-                            type="date"
-                            onChange={handleDateChange}
-                        />
-                    </div>
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Time <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                        required
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Time"
-                        name="eventTime"
-                        type="time"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Event Media Upload
-                    </Label>
-                    <Input
-                        className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
-                        placeholder="Enter Event Media"
-                        name="eventMedia"
-                        type="file"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                    <Label className="text-xl font-bold text-gray-800 w-full">
-                        Ticket Price
-                    </Label>
-                    <div className="flex w-full gap-2">
-                        <Input
-                            className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
-                            type="text"
-                            placeholder="Ticket Type Name"
-                            name="name"
-                            value={singleTicket.name}
-                            onChange={(e) =>
-                                setSingleTicket({
-                                    ...singleTicket,
-                                    [e.target.name]: e.target.value,
-                                })
-                            }
-                        />
-                        <Input
-                            className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
-                            type="text"
-                            placeholder="Ticket Type Price"
-                            name="price"
-                            value={singleTicket.price}
-                            onChange={(e) =>
-                                setSingleTicket({
-                                    ...singleTicket,
-                                    [e.target.name]: e.target.value,
-                                })
-                            }
-                        />
-                        <Input
-                            className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
-                            type="text"
-                            placeholder="Ticket Type Limit"
-                            name="limit"
-                            value={singleTicket.limit}
-                            onChange={(e) =>
-                                setSingleTicket({
-                                    ...singleTicket,
-                                    [e.target.name]: e.target.value,
-                                })
-                            }
-                        />
-                        <Button onClick={ticketListHandle}>Add Ticket</Button>
-                    </div>
-                </div>
-                {ticketList && ticketList.length > 0 && (
-                    <div className="w-full flex">
-                        <div className="w-full text-xl font-bold text-gray-800">
-                            Ticket(s)
-                        </div>
-                        <div className="w-full items-center">
-                            {ticketList &&
-                                ticketList?.map((e, i) => (
-                                    <div key={i} className="flex gap-2 w-full">
-                                        <div className="flex w-full hover:bg-gray-100">
-                                            <Input
-                                                value={e.name}
-                                                className="w-full"
-                                                disabled
-                                            />
-                                            <Input
-                                                value={e.price}
-                                                className="w-full"
-                                                disabled
-                                            />
-                                            <Input
-                                                value={e.limit}
-                                                className="w-full"
-                                                disabled
-                                            />
-                                        </div>
-                                        <div
-                                            onClick={() =>
-                                                ticketsRemoveHandle(i)
-                                            }
-                                        >
-                                            <IoIosClose size={42} />
-                                        </div>
-                                    </div>
-                                ))}
-                        </div>
-                    </div>
-                )}
-                <Button
-                    className="text-xl cursor-pointer"
-                    onClick={handleSubmit}
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Organizer
+          </Label>
+          <Input
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Organizer"
+            name="eventOrganizer"
+            type="text"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Guests
+          </Label>
+          <div className="flex w-full gap-2">
+            <Input
+              className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+              placeholder="Enter Event Guests"
+              value={guestName}
+              type="text"
+              onChange={(e) => setGuestName(e.target.value)}
+            />
+            <Button onClick={addGuestHandle}>Add Guest</Button>
+          </div>
+        </div>
+        <div className="flex w-full">
+          <div className="w-full"></div>
+          <div className="flex gap-2 w-full">
+            {guestList &&
+              guestList.map((e, i) => (
+                <div
+                  key={i}
+                  className="border-2 p-2 flex items-center gap-2 cursor-pointer hover:bg-gray-100"
                 >
-                    Create Event
-                </Button>
+                  {e}{" "}
+                  <IoIosClose
+                    size={24}
+                    onClick={() => removeGuestNameFromListHandle(i)}
+                  />
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Address <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            required
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Address"
+            name="eventAddress"
+            type="text"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event City <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            required
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event City"
+            name="eventCity"
+            type="text"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Pincode <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            required
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Pincode"
+            name="eventPinCode"
+            type="text"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Date <span className="text-red-500">*</span>
+          </Label>
+          <div className="border-2 w-full bg-gray-50">
+            <DateSelector
+              required
+              placeHolderMessage="Select Event Date"
+              placeholder="Enter Event Date"
+              name="eventDate"
+              type="date"
+              onChange={handleDateChange}
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Time <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            required
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Time"
+            name="eventTime"
+            type="time"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Event Media Upload
+          </Label>
+          <Input
+            className="border-2 cursor-pointer hover:bg-gray-100 text-xl"
+            placeholder="Enter Event Media"
+            name="eventMedia"
+            type="file"
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Label className="text-xl font-bold text-gray-800 w-full">
+            Ticket Price
+          </Label>
+          <div className="flex w-full gap-2">
+            <Input
+              className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
+              type="text"
+              placeholder="Ticket Type Name"
+              name="name"
+              value={singleTicket.name}
+              onChange={(e) =>
+                setSingleTicket({
+                  ...singleTicket,
+                  [e.target.name]: e.target.value,
+                })
+              }
+            />
+            <Input
+              className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
+              type="text"
+              placeholder="Ticket Type Price"
+              name="price"
+              value={singleTicket.price}
+              onChange={(e) =>
+                setSingleTicket({
+                  ...singleTicket,
+                  [e.target.name]: e.target.value,
+                })
+              }
+            />
+            <Input
+              className="border-2 cursor-pointer hover:bg-gray-100 text-xl w-full"
+              type="text"
+              placeholder="Ticket Type Limit"
+              name="limit"
+              value={singleTicket.limit}
+              onChange={(e) =>
+                setSingleTicket({
+                  ...singleTicket,
+                  [e.target.name]: e.target.value,
+                })
+              }
+            />
+            <Button onClick={ticketListHandle}>Add Ticket</Button>
+          </div>
+        </div>
+        {ticketList && ticketList.length > 0 && (
+          <div className="w-full flex">
+            <div className="w-full text-xl font-bold text-gray-800">
+              Ticket(s)
             </div>
-        </>
-    );
+            <div className="w-full items-center">
+              {ticketList &&
+                ticketList?.map((e, i) => (
+                  <div key={i} className="flex gap-2 w-full">
+                    <div className="flex w-full hover:bg-gray-100">
+                      <Input value={e.name} className="w-full" disabled />
+                      <Input value={e.price} className="w-full" disabled />
+                      <Input value={e.limit} className="w-full" disabled />
+                    </div>
+                    <div onClick={() => ticketsRemoveHandle(i)}>
+                      <IoIosClose size={42} />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+        <Button className="text-xl cursor-pointer" onClick={handleSubmit}>
+          Create Event
+        </Button>
+      </div>
+    </>
+  );
 };
 
 export default CreateEventsPage;

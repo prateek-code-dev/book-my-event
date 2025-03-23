@@ -12,76 +12,76 @@ import Layout from "./Layout/Layout.jsx";
 import EventDetails from "./pages/EventDetails";
 
 const App = () => {
-    return (
-        <>
-            <BrowserRouter>
-                <Routes>
-                    <Route
-                        path="/login"
-                        element={
-                            <PublicRoute>
-                                <LoginPage />
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path="/register"
-                        element={
-                            <PublicRoute>
-                                <RegisterPage />
-                            </PublicRoute>
-                        }
-                    />
+  return (
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
 
-                    {/* With Layout */}
-                    <Route path="/" element={<Layout />}>
-                        <Route
-                            path="/"
-                            element={
-                                <ProtectedRoute>
-                                    <HomePage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/event/:id"
-                            element={
-                                <ProtectedRoute>
-                                    <EventDetails />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/create-event"
-                            element={
-                                <ProtectedRoute userType="admin">
-                                    <CreateEventsPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/all-event"
-                            element={
-                                <ProtectedRoute userType="admin">
-                                    <DisplayAllEventsPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/edit-event/:id"
-                            element={
-                                <ProtectedRoute>
-                                    <EditEventsPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                    </Route>
+          {/* With Layout */}
+          <Route path="/" element={<Layout />}>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/event/:id"
+              element={
+                <ProtectedRoute>
+                  <EventDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/create-event"
+              element={
+                <ProtectedRoute userType="admin">
+                  <CreateEventsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/all-event"
+              element={
+                <ProtectedRoute userType="admin">
+                  <DisplayAllEventsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/edit-event/:id"
+              element={
+                <ProtectedRoute>
+                  <EditEventsPage />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-                    <Route path="*" element={<div>404, Please login</div>} />
-                </Routes>
-            </BrowserRouter>
-        </>
-    );
+          <Route path="*" element={<div>404, Please login</div>} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 };
 
 export default App;
