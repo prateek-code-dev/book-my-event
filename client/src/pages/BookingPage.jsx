@@ -1,5 +1,8 @@
 import { showToast } from "@/helper/showToast";
-import { getBookingDetailsFunction } from "@/redux/slices/bookingSlice";
+import {
+    cancelBookingTicketFunction,
+    getBookingDetailsFunction,
+} from "@/redux/slices/bookingSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,12 +18,20 @@ import Loading from "@/components/project-components/Loading";
 import moment from "moment";
 import { MdCancel } from "react-icons/md";
 import { GrOverview } from "react-icons/gr";
+import Modal from "@/components/project-components/Modal";
+import { refundPaymentFunction } from "@/redux/slices/paymentSlice";
 
 const BookingPage = () => {
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => state.booked);
 
+    const paymentLoading = useSelector((state) => state.payment);
+
     const [bookingData, setBookingData] = useState([]);
+
+    const [bookedTicket, setBookingTicket] = useState(null);
+
+    const [isOpen, setIsOpen] = useState(false);
 
     const getBookingsData = async () => {
         try {
@@ -36,13 +47,76 @@ const BookingPage = () => {
         }
     };
 
-    console.log("bookingData", bookingData);
+    // console.log("bookingData", bookingData);
 
-    const handleBookingCancel = (bookedTicket) => {
-        console.log("bookedTicket", bookedTicket);
+    const refundPayment = async () => {
+        try {
+            const postData = {
+                bookedPaymentId: bookedTicket?.paymentId,
+                refundAmount: bookedTicket?.totalAmount,
+                refundNotes: {
+                    eventName: bookedTicket?.event?.eventName,
+                    eventDate: bookedTicket?.event?.eventDate,
+                    ticketCount: bookedTicket?.ticketCount,
+                    user: bookedTicket?.user?.email,
+                    name: bookedTicket?.user?.name,
+                    description: "Cancellation",
+                },
+            };
+            const response = await dispatch(
+                refundPaymentFunction(postData)
+            ).unwrap();
+
+            if (!response.success) {
+                return showToast(
+                    "error",
+                    `Error! in payment refund! Contact Administrator`
+                );
+            }
+
+            showToast(
+                "success",
+                `Payment refund successfully done! Check account after 48 hours!`
+            );
+
+            await getBookingsData();
+
+            return;
+        } catch (error) {
+            showToast("error", `Error! ${error.message || error} `);
+        }
     };
 
-    
+    const deleteBookedTicketHandler = async () => {
+        // console.log("bookedTicket", bookedTicket);
+
+        setIsOpen(false);
+
+        const postData = {
+            bookingId: bookedTicket?._id,
+            eventId: bookedTicket?.event?._id,
+            ticketType: bookedTicket?.ticketType,
+            ticketCount: bookedTicket?.ticketCount,
+        };
+
+        try {
+            const response = await dispatch(
+                cancelBookingTicketFunction(postData)
+            ).unwrap();
+
+            if (!response.success) {
+                showToast("error", `Error! ${response?.message}`);
+
+                await getBookingsData();
+
+                return;
+            }
+
+            await refundPayment();
+        } catch (error) {
+            showToast("error", `Error! ${error.message || error}`);
+        }
+    };
 
     useEffect(() => {
         getBookingsData();
@@ -75,7 +149,7 @@ const BookingPage = () => {
                             {bookingData.data &&
                                 bookingData.data.length > 0 &&
                                 bookingData.data.map((item, index) => (
-                                    <TableRow>
+                                    <TableRow key={index}>
                                         <TableCell className="font-bold">
                                             {item?.event?.eventName}
                                         </TableCell>
@@ -92,13 +166,16 @@ const BookingPage = () => {
                                             {(item?.status).toUpperCase()}
                                         </TableCell>
                                         <TableCell>
-                                            <MdCancel
-                                                size="20"
-                                                className="cursor-pointer text-red-700 hover:text-red-400"
-                                                onClick={() =>
-                                                    handleBookingCancel(item)
-                                                }
-                                            />
+                                            {item?.status == "booked" && (
+                                                <MdCancel
+                                                    size="20"
+                                                    className="cursor-pointer text-red-700 hover:text-red-400"
+                                                    onClick={() => {
+                                                        setBookingTicket(item);
+                                                        setIsOpen(true);
+                                                    }}
+                                                />
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -106,6 +183,12 @@ const BookingPage = () => {
                     </Table>
                 )}
             </div>
+
+            <Modal
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                handleAction={deleteBookedTicketHandler}
+            />
         </>
     );
 };

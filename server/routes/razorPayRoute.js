@@ -1,7 +1,8 @@
 import { Router } from "express";
 import {
-  razorPayPaymentController,
-  verifyPaymentController,
+    razorPayPaymentController,
+    refundPaymentController,
+    verifyPaymentController,
 } from "../controllers/razorPayController.js";
 
 export const razorPayPaymentRouter = Router();
@@ -9,3 +10,5 @@ export const razorPayPaymentRouter = Router();
 razorPayPaymentRouter.post("/create-order", razorPayPaymentController);
 
 razorPayPaymentRouter.post("/verify-payment", verifyPaymentController);
+
+razorPayPaymentRouter.post("/refund", refundPaymentController);

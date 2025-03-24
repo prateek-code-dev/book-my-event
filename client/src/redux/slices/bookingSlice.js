@@ -1,4 +1,5 @@
 import {
+    cancelBookingTicketRequest,
     createBookingRequest,
     getBookingDetailsRequest,
 } from "@/services/bookingsApi";
@@ -30,6 +31,19 @@ export const getBookingDetailsFunction = createAsyncThunk(
     }
 );
 
+export const cancelBookingTicketFunction = createAsyncThunk(
+    "cancelBookingTicket",
+    async (postData, thunkAPI) => {
+        try {
+            const result = await cancelBookingTicketRequest(postData);
+
+            return result;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(`Error! ${error.message || error}`);
+        }
+    }
+);
+
 export const bookingSlice = createSlice({
     name: "bookingSlice",
     initialState: {
@@ -37,6 +51,7 @@ export const bookingSlice = createSlice({
         error: null,
         lastBookedTickets: [],
         allBookings: [],
+        lastCancelledTicket: [],
     },
     extraReducers: (builder) => {
         builder
@@ -62,6 +77,19 @@ export const bookingSlice = createSlice({
                 state.allBookings = action.payload;
             })
             .addCase(getBookingDetailsFunction.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Cancel Booking (cancelBookingTicketFunction)
+            .addCase(cancelBookingTicketFunction.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(cancelBookingTicketFunction.fulfilled, (state, action) => {
+                state.loading = false;
+                state.lastCancelledTicket = action.payload;
+            })
+            .addCase(cancelBookingTicketFunction.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });
