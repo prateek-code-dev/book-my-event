@@ -1,8 +1,8 @@
 import { Router } from "express";
 import {
-    razorPayPaymentController,
-    refundPaymentController,
-    verifyPaymentController,
+  razorPayPaymentController,
+  refundPaymentController,
+  verifyPaymentController,
 } from "../controllers/razorPayController.js";
 
 export const razorPayPaymentRouter = Router();
