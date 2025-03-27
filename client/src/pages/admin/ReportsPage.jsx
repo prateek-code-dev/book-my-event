@@ -1,9 +1,11 @@
 import DateSelector from "@/components/project-components/DateSelector";
 import ReportCard from "@/components/project-components/ReportCard";
+import SelectOptions from "@/components/project-components/SelectOptions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/helper/showToast";
 import { getAllBookingsFunction } from "@/redux/slices/bookingSlice";
+import { getAllEventsFunction } from "@/redux/slices/eventSlice";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -11,6 +13,28 @@ const ReportsPage = () => {
     const dispatch = useDispatch();
 
     const [bookingsData, setBookingsData] = useState(null);
+
+    const [eventsData, setEventsData] = useState(null);
+
+    console.log("eventsData", eventsData);
+
+    const getEventsData = async () => {
+        try {
+            const response = await dispatch(getAllEventsFunction()).unwrap();
+
+            if (!response.success) {
+                showToast("error", `Error! ${response.message}`);
+            }
+
+            const eventsList = response.data.map(
+                (item, index) => item.eventName
+            );
+
+            setEventsData(eventsList);
+        } catch (error) {
+            showToast("error", `Error! ${error.message || error}`);
+        }
+    };
 
     const getBookingsData = async () => {
         try {
@@ -25,12 +49,14 @@ const ReportsPage = () => {
             showToast("error", `Error! ${error.message || error}`);
         }
     };
-    console.log("bookingsData", bookingsData);
+
     useEffect(() => {
         getBookingsData();
     }, []);
 
-    let totalRevenue = 0;
+    useEffect(() => {
+        getEventsData();
+    }, []);
 
     const reportData = useMemo(() => {
         if (!bookingsData || bookingsData.length === 0) {
@@ -99,30 +125,30 @@ const ReportsPage = () => {
                 <p className="text-3xl font-bold text-gray-800 p-2">Reports</p>
             </div>
 
-            <div className="flex items-center px-2">
-                <div className="px-2 py-2 hover:cursor-pointer">
+            <div className="flex items-center justify-between px-2 w-full ">
+                <div className="px-2 hover:cursor-pointer w-full">
                     <p>Event</p>
-                    <Input />
+                    <SelectOptions listItems={eventsData} />
                 </div>
 
-                <div className="px-2 py-2 hover:cursor-pointer">
+                <div className="px-2 hover:cursor-pointer w-full">
                     <p>Start Date</p>
-                    <DateSelector />
+                    <DateSelector className="hover:cursor-pointer w-full" />
                 </div>
 
-                <div className="px-2 py-2 hover:cursor-pointer">
+                <div className="px-2 hover:cursor-pointer w-full ">
                     <p>End Date</p>
-                    <DateSelector />
+                    <DateSelector className="hover:cursor-pointer w-full" />
                 </div>
 
-                <div className="px-2 py-2 hover:cursor-pointer">
-                    <Button className="hover:cursor-pointer">
+                <div className="px-2 pt-6 hover:cursor-pointer w-full ">
+                    <Button className="hover:cursor-pointer w-full">
                         Clear Filters
                     </Button>
                 </div>
 
-                <div className="px-2 py-2 hover:cursor-pointer">
-                    <Button className="hover:cursor-pointer">
+                <div className="px-2 pt-6 hover:cursor-pointer w-full ">
+                    <Button className="hover:cursor-pointer w-full">
                         Fetch Reports
                     </Button>
                 </div>
