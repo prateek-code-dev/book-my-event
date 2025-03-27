@@ -11,6 +11,7 @@ import EditEventsPage from "./pages/admin/EditEventsPage";
 import Layout from "./Layout/Layout.jsx";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import BookingPage from "./pages/BookingPage";
+import ReportsPage from "./pages/admin/ReportsPage";
 
 const App = () => {
   return (
@@ -84,7 +85,18 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/admin/report"
+              element={
+                <ProtectedRoute userType="admin">
+                  <ReportsPage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
+
+
 
           <Route path="*" element={<div>404, Please login</div>} />
         </Routes>

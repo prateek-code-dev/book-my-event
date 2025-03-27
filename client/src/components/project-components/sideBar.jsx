@@ -45,7 +45,7 @@ const adminSideBarItemsList = [
   {
     name: "Reports",
     icon: "",
-    path: "/admin/reports",
+    path: "/admin/report",
   },
   {
     name: "Logout",
