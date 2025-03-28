@@ -102,14 +102,8 @@ export const getUserBookingsController = async (req, res, next) => {
 
 export const getAllBookingsController = async (req, res, next) => {
     try {
-        let { filter } = req.body;
-
-        if (!filter) {
-            filter = {};
-        }
-
         const result = await bookingModel
-            .find(filter)
+            .find({})
             .populate("user")
             .populate("event");
 

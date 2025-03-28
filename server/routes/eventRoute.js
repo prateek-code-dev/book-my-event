@@ -11,7 +11,7 @@ import { adminAuthorizeMiddleware } from "../middleware/adminAuthorize.js";
 
 export const eventRouter = Router();
 
-eventRouter.get("/all-events", validateToken, getAllEventsController);
+eventRouter.post("/all-events", validateToken, getAllEventsController);
 
 eventRouter.post(
     "/create-event",

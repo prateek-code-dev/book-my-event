@@ -1,8 +1,5 @@
 import DateSelector from "@/components/project-components/DateSelector";
 import ReportCard from "@/components/project-components/ReportCard";
-import SelectOptions from "@/components/project-components/SelectOptions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { showToast } from "@/helper/showToast";
 import { getAllBookingsFunction } from "@/redux/slices/bookingSlice";
 import { getAllEventsFunction } from "@/redux/slices/eventSlice";
@@ -15,12 +12,6 @@ const ReportsPage = () => {
     const [bookingsData, setBookingsData] = useState(null);
 
     const [eventsData, setEventsData] = useState(null);
-
-    const [filter, setFilter] = useState({
-        event: "",
-        startDate: null,
-        endDate: null,
-    });
 
     const getEventsData = async () => {
         try {
@@ -121,62 +112,10 @@ const ReportsPage = () => {
         ];
     }, [bookingsData]);
 
-    const updateFilter = (key, value) => {
-        setFilter((prev) => ({ ...prev, [key]: value }));
-    };
-
-    const clearFilters = () => {
-        setFilter({ event: "", startDate: null, endDate: null });
-    };
-
     return (
         <div className="w-full">
             <div className="flex items-center justify-between px-2">
                 <p className="text-3xl font-bold text-gray-800 p-2">Reports</p>
-            </div>
-
-            <div className="flex items-center justify-between px-2 w-full ">
-                <div className="px-2 hover:cursor-pointer w-full">
-                    <p>Event</p>
-                    <SelectOptions
-                        listItems={eventsData}
-                        value={filter.event}
-                        onChange={(value) => updateFilter("event", value)}
-                    />
-                </div>
-
-                <div className="px-2 hover:cursor-pointer w-full">
-                    <p>Start Date</p>
-                    <DateSelector
-                        className="hover:cursor-pointer w-full"
-                        selected={filter.startDate || undefined}
-                        onChange={(value) => updateFilter("startDate", value)}
-                    />
-                </div>
-
-                <div className="px-2 hover:cursor-pointer w-full ">
-                    <p>End Date</p>
-                    <DateSelector
-                        className="hover:cursor-pointer w-full"
-                        selected={filter.endDate || undefined}
-                        onChange={(date) => updateFilter("endDate", date)}
-                    />
-                </div>
-
-                <div className="px-2 pt-6 hover:cursor-pointer w-full ">
-                    <Button
-                        className="hover:cursor-pointer w-full"
-                        onClick={clearFilters}
-                    >
-                        Clear Filters
-                    </Button>
-                </div>
-
-                <div className="px-2 pt-6 hover:cursor-pointer w-full ">
-                    <Button className="hover:cursor-pointer w-full">
-                        Fetch Reports
-                    </Button>
-                </div>
             </div>
 
             <div className="px-4 py-4 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -190,6 +129,12 @@ const ReportsPage = () => {
                             value={item.value}
                         />
                     ))}
+            </div>
+
+            <div className="flex items-center justify-center">
+                {bookingsData && bookingsData.length < 1 && (
+                    <p className="text-2xl font-medium text-gray-700">No bookings done yet!</p>
+                )}
             </div>
 
             <div></div>

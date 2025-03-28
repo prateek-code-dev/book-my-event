@@ -7,6 +7,7 @@ import { HiDocumentReport } from "react-icons/hi";
 import { IoMdBookmarks } from "react-icons/io";
 import { IoHomeSharp, IoLogOut } from "react-icons/io5";
 import { MdEventNote } from "react-icons/md";
+import { ThemeToggle } from "../theme-toggle";
 
 const userSideBarItemsList = [
     {
@@ -98,6 +99,9 @@ const SideBar = () => {
                             </Link>
                         </div>
                     ))}
+                <div className="my-8 w-full">
+                    <ThemeToggle />
+                </div>
             </div>
         </>
     );
