@@ -6,11 +6,11 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import React from "react";
+import React, { useState } from "react";
 
-const SelectOptions = ({ listItems }) => {
+const SelectOptions = ({ listItems, onChange, value }) => {
     return (
-        <Select>
+        <Select onValueChange={onChange} value={value}>
             <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select Event" />
             </SelectTrigger>
@@ -18,7 +18,7 @@ const SelectOptions = ({ listItems }) => {
                 {listItems &&
                     listItems.length > 0 &&
                     listItems.map((item, index) => (
-                        <SelectItem key={index} value="dark">
+                        <SelectItem key={index} value={item}>
                             {item}
                         </SelectItem>
                     ))}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,8 +10,12 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 
-const DateSelector = ({ placeHolderMessage, onChange }) => {
+const DateSelector = ({ placeHolderMessage, onChange, selected }) => {
     const [date, setDate] = useState();
+
+    useEffect(() => {
+        setDate(selected);
+    }, [selected]);
 
     const handleSelect = (selectedDate) => {
         const isoDate = selectedDate.toISOString();

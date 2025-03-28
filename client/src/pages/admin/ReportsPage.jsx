@@ -18,8 +18,8 @@ const ReportsPage = () => {
 
     const [filter, setFilter] = useState({
         event: "",
-        startDate: "",
-        endDate: "",
+        startDate: null,
+        endDate: null,
     });
 
     const getEventsData = async () => {
@@ -121,15 +121,12 @@ const ReportsPage = () => {
         ];
     }, [bookingsData]);
 
-    console.log("reportData", reportData);
+    const updateFilter = (key, value) => {
+        setFilter((prev) => ({ ...prev, [key]: value }));
+    };
 
-    console.log("filter", filter);
-
-    const handleDateChange = (name, value) => {
-        console.log("name", name);
-        console.log("value", value);
-
-        setFilter({ ...filter, [name]: value });
+    const clearFilters = () => {
+        setFilter({ event: "", startDate: null, endDate: null });
     };
 
     return (
@@ -141,14 +138,19 @@ const ReportsPage = () => {
             <div className="flex items-center justify-between px-2 w-full ">
                 <div className="px-2 hover:cursor-pointer w-full">
                     <p>Event</p>
-                    <SelectOptions listItems={eventsData} />
+                    <SelectOptions
+                        listItems={eventsData}
+                        value={filter.event}
+                        onChange={(value) => updateFilter("event", value)}
+                    />
                 </div>
 
                 <div className="px-2 hover:cursor-pointer w-full">
                     <p>Start Date</p>
                     <DateSelector
                         className="hover:cursor-pointer w-full"
-                        onChange={(date) => handleDateChange("startDate", date)}
+                        selected={filter.startDate || undefined}
+                        onChange={(value) => updateFilter("startDate", value)}
                     />
                 </div>
 
@@ -156,14 +158,15 @@ const ReportsPage = () => {
                     <p>End Date</p>
                     <DateSelector
                         className="hover:cursor-pointer w-full"
-                        onChange={(date) => handleDateChange("endDate", date)}
+                        selected={filter.endDate || undefined}
+                        onChange={(date) => updateFilter("endDate", date)}
                     />
                 </div>
 
                 <div className="px-2 pt-6 hover:cursor-pointer w-full ">
                     <Button
                         className="hover:cursor-pointer w-full"
-                        onClick={() => setFilter({})}
+                        onClick={clearFilters}
                     >
                         Clear Filters
                     </Button>
@@ -179,8 +182,9 @@ const ReportsPage = () => {
             <div className="px-4 py-4 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {reportData &&
                     reportData.length > 0 &&
-                    reportData.map((item) => (
+                    reportData.map((item, index) => (
                         <ReportCard
+                            key={index}
                             title={item.title}
                             description={item.description}
                             value={item.value}
