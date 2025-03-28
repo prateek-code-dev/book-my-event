@@ -16,7 +16,11 @@ const ReportsPage = () => {
 
     const [eventsData, setEventsData] = useState(null);
 
-    console.log("eventsData", eventsData);
+    const [filter, setFilter] = useState({
+        event: "",
+        startDate: "",
+        endDate: "",
+    });
 
     const getEventsData = async () => {
         try {
@@ -119,6 +123,15 @@ const ReportsPage = () => {
 
     console.log("reportData", reportData);
 
+    console.log("filter", filter);
+
+    const handleDateChange = (name, value) => {
+        console.log("name", name);
+        console.log("value", value);
+
+        setFilter({ ...filter, [name]: value });
+    };
+
     return (
         <div className="w-full">
             <div className="flex items-center justify-between px-2">
@@ -133,16 +146,25 @@ const ReportsPage = () => {
 
                 <div className="px-2 hover:cursor-pointer w-full">
                     <p>Start Date</p>
-                    <DateSelector className="hover:cursor-pointer w-full" />
+                    <DateSelector
+                        className="hover:cursor-pointer w-full"
+                        onChange={(date) => handleDateChange("startDate", date)}
+                    />
                 </div>
 
                 <div className="px-2 hover:cursor-pointer w-full ">
                     <p>End Date</p>
-                    <DateSelector className="hover:cursor-pointer w-full" />
+                    <DateSelector
+                        className="hover:cursor-pointer w-full"
+                        onChange={(date) => handleDateChange("endDate", date)}
+                    />
                 </div>
 
                 <div className="px-2 pt-6 hover:cursor-pointer w-full ">
-                    <Button className="hover:cursor-pointer w-full">
+                    <Button
+                        className="hover:cursor-pointer w-full"
+                        onClick={() => setFilter({})}
+                    >
                         Clear Filters
                     </Button>
                 </div>
